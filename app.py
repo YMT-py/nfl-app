@@ -19,10 +19,10 @@ def calculate_optimal_play_ratio(offense, defense):
 
     return round(pass_ratio, 1), round(run_ratio, 1)
 
-
+# 1. Flaskの「本体」を立ち上げる
 app = Flask(__name__)
 
-
+# 2. トップページ（ / ）にアクセスされたときの動き
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
@@ -46,6 +46,6 @@ def index():
 
     return render_template("index.html", result=result, error=error)
 
-
+# 3. おまじない（ローカルで実行したときだけ起動する）
 if __name__ == "__main__":
     app.run(debug=True)
