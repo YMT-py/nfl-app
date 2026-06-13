@@ -3,35 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFL Playbook Strategy Predictor</title>
+    <title>NFL Stats Predictor</title>
 </head>
 <body>
 
-    <h1>NFL Playbook Predictor</h1>
+    <h1>NFL Stats Predictor</h1>
     
-    <form action="/predict" method="POST">
+    <form action="/" method="POST">
+        <h3>Offense Stats (Team A)</h3>
         <p>
-            <label for="down">Down:</label>
-            <select name="down" id="down">
-                <option value="1">1st Down</option>
-                <option value="2">2nd Down</option>
-                <option value="3">3rd Down</option>
-                <option value="4">4th Down</option>
-            </select>
+            <label for="off_pass">Passing Yards/Game:</label>
+            <input type="number" name="off_pass" id="off_pass" step="0.1" value="250" required>
+        </p>
+        <p>
+            <label for="off_run">Rushing Yards/Game:</label>
+            <input type="number" name="off_run" id="off_run" step="0.1" value="110" required>
         </p>
 
+        <h3>Defense Stats (Team B)</h3>
         <p>
-            <label for="distance">Yards to Go (Distance):</label>
-            <input type="number" name="distance" id="distance" min="1" max="99" value="10" required>
+            <label for="def_pass_allowed">Passing Yards Allowed/Game:</label>
+            <input type="number" name="def_pass_allowed" id="def_pass_allowed" step="0.1" value="230" required>
+        </p>
+        <p>
+            <label for="def_run_allowed">Rushing Yards Allowed/Game:</label>
+            <input type="number" name="def_run_allowed" id="def_run_allowed" step="0.1" value="120" required>
         </p>
 
-        <button type="submit">Predict Play Call</button>
+        <button type="submit">Calculate Prediction</button>
     </form>
 
-    {% if prediction %}
-    <h2>Recommended Play:</h2>
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if result %}
+    <h2>Optimal Play Ratio:</h2>
     <p style="font-size: 20px; font-weight: bold;">
-        {{ prediction }}
+        PASS: {{ result.pass }}%<br>
+        RUN: {{ result.run }}%
     </p>
     {% endif %}
 
