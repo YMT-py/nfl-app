@@ -3,47 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFL Stats Predictor</title>
+    <title>NFL Stats Simulator - Pro</title>
+    <style>
+        /* モダンで洗練されたスポーツ・アナリティクス・デザイン */
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #121212; /* 深いダークグレー */
+            color: #e0e0e0;
+            max-width: 900px; /* ワイドに配置 */
+            margin: 40px auto;
+            padding: 30px;
+        }
+
+        .container {
+            background-color: #1e1e1e; /* わずかに明るいグレーのカード */
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            border: 1px solid #333; /* かすかな枠線 */
+        }
+
+        h1 {
+            color: #ffffff;
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #69BE28; /* Seahawks Green のアクセント */
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2列配置 */
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .stats-group {
+            background-color: #252525;
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+
+        h3 {
+            color: #69BE28; /* アクセントカラー */
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #aaaaaa;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #333;
+            border: 1px solid #555;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 16px;
+            box-sizing: border-box; /* パディングを含める */
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #69BE28; /* フォーカス時にグリーン */
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #69BE28 0%, #59a622 100%); /* きれいなグラデーション */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(105, 190, 40, 0.4);
+            transition: transform 0.1s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            box-shadow: 0 6px 20px rgba(105, 190, 40, 0.6);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 10px rgba(105, 190, 40, 0.4);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            background-color: rgba(255, 107, 107, 0.1);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 25px;
+            background-color: #252525;
+            border-radius: 8px;
+            border-left: 5px solid #69BE28;
+            text-align: center;
+        }
+
+        .result-title {
+            color: #aaaaaa;
+            text-transform: uppercase;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
 
-    <h1>NFL Stats Predictor</h1>
-    
-    <form action="/" method="POST">
-        <h3>Offense Stats (Team A)</h3>
-        <p>
-            <label for="off_pass">Passing Yards/Game:</label>
-            <input type="number" name="off_pass" id="off_pass" step="0.1" value="250" required>
-        </p>
-        <p>
-            <label for="off_run">Rushing Yards/Game:</label>
-            <input type="number" name="off_run" id="off_run" step="0.1" value="110" required>
-        </p>
+    <div class="container">
+        <h1>NFL Stats Simulator</h1>
+        
+        <form action="/" method="POST">
+            {% if error %}
+            <div class="error-message">{{ error }}</div>
+            {% endif %}
 
-        <h3>Defense Stats (Team B)</h3>
-        <p>
-            <label for="def_pass_allowed">Passing Yards Allowed/Game:</label>
-            <input type="number" name="def_pass_allowed" id="def_pass_allowed" step="0.1" value="230" required>
-        </p>
-        <p>
-            <label for="def_run_allowed">Rushing Yards Allowed/Game:</label>
-            <input type="number" name="def_run_allowed" id="def_run_allowed" step="0.1" value="120" required>
-        </p>
+            <div class="stats-grid">
+                <div class="stats-group">
+                    <h3>Offense (Team A)</h3>
+                    <div class="form-group">
+                        <label for="off_pass">Passing Yards/Game</label>
+                        <input type="number" name="off_pass" id="off_pass" step="0.1" value="250" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="off_run">Rushing Yards/Game</label>
+                        <input type="number" name="off_run" id="off_run" step="0.1" value="110" required>
+                    </div>
+                </div>
 
-        <button type="submit">Calculate Prediction</button>
-    </form>
+                <div class="stats-group">
+                    <h3>Defense (Team B)</h3>
+                    <div class="form-group">
+                        <label for="def_pass_allowed">Pass Yards Allowed/Game</label>
+                        <input type="number" name="def_pass_allowed" id="def_pass_allowed" step="0.1" value="230" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="def_run_allowed">Run Yards Allowed/Game</label>
+                        <input type="number" name="def_run_allowed" id="def_run_allowed" step="0.1" value="120" required>
+                    </div>
+                </div>
+            </div>
 
-    {% if error %}
-    <p style="color: red;">{{ error }}</p>
-    {% endif %}
+            <button type="submit">Calculate Optimal Ratio</button>
+        </form>
 
-    {% if result %}
-    <h2>Optimal Play Ratio:</h2>
-    <p style="font-size: 20px; font-weight: bold;">
-        PASS: {{ result.pass }}%<br>
-        RUN: {{ result.run }}%
-    </p>
-    {% endif %}
+        {% if result %}
+        <div class="result-container">
+            <div class="result-title">Optimal Play Ratio</div>
+            <p class="result-value">
+                PASS: {{ result.pass }}%  |  RUN: {{ result.run }}%
+            </p>
+        </div>
+        {% endif %}
+    </div>
 
 </body>
 </html>
