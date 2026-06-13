@@ -4,65 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NFL Playbook Strategy Predictor</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #002244; /* Seahawks Navy */
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        select, input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #69BE28; /* Seahawks Action Green */
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #59a622;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e8f5e9;
-            border-left: 5px solid #69BE28;
-            border-radius: 4px;
-        }
-    </style>
 </head>
 <body>
 
     <h1>NFL Playbook Predictor</h1>
     
     <form action="/predict" method="POST">
-        <div class="form-group">
+        <p>
             <label for="down">Down:</label>
             <select name="down" id="down">
                 <option value="1">1st Down</option>
@@ -70,23 +18,21 @@
                 <option value="3">3rd Down</option>
                 <option value="4">4th Down</option>
             </select>
-        </div>
+        </p>
 
-        <div class="form-group">
+        <p>
             <label for="distance">Yards to Go (Distance):</label>
             <input type="number" name="distance" id="distance" min="1" max="99" value="10" required>
-        </div>
+        </p>
 
         <button type="submit">Predict Play Call</button>
     </form>
 
     {% if prediction %}
-    <div class="result">
-        <h2>Recommended Play:</h2>
-        <p style="font-size: 24px; font-weight: bold; color: #002244; margin: 5px 0;">
-            {{ prediction }}
-        </p>
-    </div>
+    <h2>Recommended Play:</h2>
+    <p style="font-size: 20px; font-weight: bold;">
+        {{ prediction }}
+    </p>
     {% endif %}
 
 </body>
