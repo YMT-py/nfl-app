@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFL Stats Simulator - Pro</title>
+    <title>NFL Stats Simulator - Neutral Pro</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #121212;
-            color: #e0e0e0;
+            background-color: #0f141c; /* NFLの伝統的な深いネイビーを混ぜたダーク背景 */
+            color: #e2e8f0;
             max-width: 900px;
             margin: 40px auto;
             padding: 30px;
         }
 
         .container {
-            background-color: #1e1e1e;
+            background-color: #17202e; /* 統一感のあるダークネイビーのカード */
             padding: 40px;
             border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-            border: 1px solid #333;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            border: 1px solid #243249;
         }
 
         h1 {
@@ -29,19 +29,18 @@
             font-weight: 700;
             letter-spacing: 1px;
             text-transform: uppercase;
-            margin-bottom: 10px; /* 説明文との間隔を調整 */
+            margin-bottom: 10px;
         }
 
-        /* 新しく追加した説明文のスタイル */
         .description {
             text-align: center;
-            color: #aaaaaa;
+            color: #94a3b8;
             font-size: 15px;
             line-height: 1.6;
             max-width: 600px;
             margin: 0 auto 40px auto;
             padding-bottom: 20px;
-            border-bottom: 2px solid #69BE28; /* 緑のラインをここへ移動 */
+            border-bottom: 2px solid #013369; /* NFL公式シールドネイビーのライン */
         }
 
         .stats-grid {
@@ -52,18 +51,21 @@
         }
 
         .stats-group {
-            background-color: #252525;
+            background-color: #1e293b;
             padding: 25px;
             border-radius: 8px;
-            border: 1px solid #444;
+            border: 1px solid #334155;
         }
 
         h3 {
-            color: #69BE28;
+            color: #ffffff; /* 特定のチームカラーではなくすっきりしたホワイト */
             margin-top: 0;
             margin-bottom: 20px;
             font-size: 18px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-left: 4px solid #d50a0a; /* NFLロゴのレッドをワンポイントのアクセントに */
+            padding-left: 10px;
         }
 
         .form-group {
@@ -75,79 +77,86 @@
             margin-bottom: 8px;
             font-weight: 600;
             font-size: 14px;
-            color: #aaaaaa;
+            color: #94a3b8;
         }
 
         input[type="number"] {
             width: 100%;
             padding: 12px;
-            background-color: #333;
-            border: 1px solid #555;
+            background-color: #0f141c;
+            border: 1px solid #475569;
             border-radius: 6px;
             color: #fff;
             font-size: 16px;
             box-sizing: border-box;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
         input[type="number"]:focus {
             outline: none;
-            border-color: #69BE28;
+            border-color: #013369; /* フォーカス時はNFLネイビー */
+            box-shadow: 0 0 0 3px rgba(1, 51, 105, 0.4);
         }
 
-        /* プレースホルダー（薄いヒント文字）の色 */
         input[type="number"]::placeholder {
-            color: #666666;
+            color: #475569;
         }
 
         button {
             width: 100%;
             padding: 15px;
-            background: linear-gradient(135deg, #69BE28 0%, #59a622 100%);
+            /* NFL公式のブルー・ネイビー系グラデーション */
+            background: linear-gradient(135deg, #013369 0%, #002244 100%);
             color: white;
-            border: none;
+            border: 1px solid #024486;
             border-radius: 8px;
             font-size: 18px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(105, 190, 40, 0.4);
-            transition: transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(1, 51, 105, 0.3);
+            transition: background 0.2s, transform 0.1s;
         }
 
         button:hover {
-            box-shadow: 0 6px 20px rgba(105, 190, 40, 0.6);
+            background: linear-gradient(135deg, #024486 0%, #013369 100%);
+            box-shadow: 0 6px 20px rgba(1, 51, 105, 0.5);
         }
 
         button:active {
             transform: translateY(1px);
-            box-shadow: 0 2px 10px rgba(105, 190, 40, 0.4);
+            box-shadow: 0 2px 10px rgba(1, 51, 105, 0.3);
         }
 
         .error-message {
-            color: #ff6b6b;
-            background-color: rgba(255, 107, 107, 0.1);
+            color: #f87171;
+            background-color: rgba(248, 113, 113, 0.1);
             padding: 15px;
             border-radius: 6px;
             margin-bottom: 20px;
             text-align: center;
+            border: 1px solid rgba(248, 113, 113, 0.2);
         }
 
         .result-container {
             margin-top: 30px;
             padding: 25px;
-            background-color: #252525;
+            background-color: #1e293b;
             border-radius: 8px;
-            border-left: 5px solid #69BE28;
+            border-left: 5px solid #013369; /* 左端のラインもNFLネイビーに */
             text-align: center;
+            border-top: 1px solid #334155;
+            border-right: 1px solid #334155;
+            border-bottom: 1px solid #334155;
         }
 
         .result-title {
-            color: #aaaaaa;
+            color: #94a3b8;
             text-transform: uppercase;
             font-size: 14px;
             margin-bottom: 10px;
+            letter-spacing: 1px;
         }
 
         .result-value {
@@ -155,6 +164,7 @@
             font-weight: 800;
             color: #ffffff;
             margin: 0;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -163,7 +173,6 @@
     <div class="container">
         <h1>NFL Stats Simulator</h1>
         
-        <!-- 📝 画面の説明文（英語）を追加しました -->
         <div class="description">
             Input the offensive stats for Team A and the defensive stats allowed for Team B to calculate the optimal play calling ratio based on team efficiency.
         </div>
@@ -179,7 +188,6 @@
                     <h3>Offense (Team A)</h3>
                     <div class="form-group">
                         <label for="off_pass">Passing Yards/Game</label>
-                        <!-- 💡 valueを消し、代わりに薄く「0.0」と出るplaceholderを設置 -->
                         <input type="number" name="off_pass" id="off_pass" step="0.1" placeholder="0.0" required>
                     </div>
                     <div class="form-group">
