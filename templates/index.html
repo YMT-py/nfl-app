@@ -1,63 +1,93 @@
-<!doctype html>
-<html lang="ja">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>NFL 戦術シミュレーター</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFL Playbook Strategy Predictor</title>
     <style>
-      body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; padding: 2rem; }
-      .card { max-width: 640px; margin: 0 auto; border: 1px solid #ddd; padding: 1.2rem; border-radius: 8px; }
-      label { display:block; margin-top:0.6rem; }
-      input[type="number"] { width:100%; padding:0.5rem; box-sizing:border-box; }
-      .row { display:flex; gap: 1rem; }
-      .col { flex:1 }
-      .result { margin-top:1rem; padding:0.8rem; background:#f7f9fc; border-radius:6px }
-      .error { color:#b00020 }
-      button { margin-top:1rem; padding:0.6rem 1rem }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #002244; /* Seahawks Navy */
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #69BE28; /* Seahawks Action Green */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #59a622;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-left: 5px solid #69BE28;
+            border-radius: 4px;
+        }
     </style>
-  </head>
-  <body>
-    <div class="card">
-      <h2>NFL 戦術シミュレーター</h2>
-      <p>攻撃・守備の4つのスタッツを入力して、推奨されるパス/ランの割合を計算します。</p>
+</head>
+<body>
 
-      {% if error %}
-        <div class="error">{{ error }}</div>
-      {% endif %}
-
-      <form method="post">
-        <div class="row">
-          <div class="col">
-            <label>攻撃 - パス攻撃力 (例: 7.5)</label>
-            <input type="number" step="any" name="off_pass" required />
-          </div>
-          <div class="col">
-            <label>攻撃 - ラン攻撃力 (例: 4.2)</label>
-            <input type="number" step="any" name="off_run" required />
-          </div>
+    <h1>NFL Playbook Predictor</h1>
+    
+    <form action="/predict" method="POST">
+        <div class="form-group">
+            <label for="down">Down:</label>
+            <select name="down" id="down">
+                <option value="1">1st Down</option>
+                <option value="2">2nd Down</option>
+                <option value="3">3rd Down</option>
+                <option value="4">4th Down</option>
+            </select>
         </div>
 
-        <div class="row">
-          <div class="col">
-            <label>守備 - パス許容 (高いほどパスが通りやすい)</label>
-            <input type="number" step="any" name="def_pass_allowed" required />
-          </div>
-          <div class="col">
-            <label>守備 - ラン許容 (高いほどランが止めにくい)</label>
-            <input type="number" step="any" name="def_run_allowed" required />
-          </div>
+        <div class="form-group">
+            <label for="distance">Yards to Go (Distance):</label>
+            <input type="number" name="distance" id="distance" min="1" max="99" value="10" required>
         </div>
 
-        <button type="submit">計算する</button>
-      </form>
+        <button type="submit">Predict Play Call</button>
+    </form>
 
-      {% if result %}
-        <div class="result">
-          <strong>推奨攻撃バランス</strong>
-          <div>パス: {{ result.pass }}% </div>
-          <div>ラン: {{ result.run }}% </div>
-        </div>
-      {% endif %}
+    {% if prediction %}
+    <div class="result">
+        <h2>Recommended Play:</h2>
+        <p style="font-size: 24px; font-weight: bold; color: #002244; margin: 5px 0;">
+            {{ prediction }}
+        </p>
     </div>
-  </body>
+    {% endif %}
+
+</body>
 </html>
