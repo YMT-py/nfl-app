@@ -187,11 +187,13 @@
                 <div class="stats-group">
                     <h3>Offense (Team A)</h3>
                     <div class="form-group">
-                        <label for="off_pass">Passing Yards/Game</label>
+                        <!-- 📝 Yards/Game から Yards per Pass Attempt に変更 -->
+                        <label for="off_pass">Yards per Pass Attempt</label>
                         <input type="number" name="off_pass" id="off_pass" step="0.1" placeholder="0.0" required>
                     </div>
                     <div class="form-group">
-                        <label for="off_run">Rushing Yards/Game</label>
+                        <!-- 📝 Yards/Game から Yards per Rush Attempt に変更 -->
+                        <label for="off_run">Yards per Rush Attempt</label>
                         <input type="number" name="off_run" id="off_run" step="0.1" placeholder="0.0" required>
                     </div>
                 </div>
@@ -200,11 +202,13 @@
                 <div class="stats-group">
                     <h3>Defense (Team B)</h3>
                     <div class="form-group">
-                        <label for="def_pass_allowed">Pass Yards Allowed/Game</label>
+                        <!-- 📝 Pass Yards Allowed/Game から Pass Yards Allowed per Attempt に変更 -->
+                        <label for="def_pass_allowed">Pass Yards Allowed per Attempt</label>
                         <input type="number" name="def_pass_allowed" id="def_pass_allowed" step="0.1" placeholder="0.0" required>
                     </div>
                     <div class="form-group">
-                        <label for="def_run_allowed">Run Yards Allowed/Game</label>
+                        <!-- 📝 Run Yards Allowed/Game から Rush Yards Allowed per Attempt に変更 -->
+                        <label for="def_run_allowed">Rush Yards Allowed per Attempt</label>
                         <input type="number" name="def_run_allowed" id="def_run_allowed" step="0.1" placeholder="0.0" required>
                     </div>
                 </div>
