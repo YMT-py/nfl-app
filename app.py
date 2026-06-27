@@ -1,54 +1,56 @@
 from flask import Flask, render_template, request
 
-
-def calculate_game_theory_ratio(off_pass, off_run, def_pass, def_run):
-    """NFLの戦術的特性（パスのハイリスク・ハイリターン性、ランの手堅さ）
-
-    を考慮して利得表を生成し、ナッシュ均衡を計算する
+def calculate_nash_and_scenarios(a, b, c, d):
     """
-    # リーグ平均の基準値
-    NFL_PASS_AVG = 7.0
-    NFL_RUN_AVG = 4.2
-
-    # 1. リーグ平均からの乖離をベースに、対戦時の基準ヤードを算出（相乗効果）
-    pass_base = (off_pass * def_pass) / NFL_PASS_AVG
-    run_base = (off_run * def_run) / NFL_RUN_AVG
-
-    # 2. アメフトのディフェンスの連動性を考慮した利得表（4パターン）の自動生成
-    a = pass_base * 0.6  # Pass vs Pass (パス徹底警戒)
-    b = pass_base * 1.3  # Pass vs Run  (ラン警戒の裏)
-    c = run_base * 1.2  # Run vs Pass  (パス警戒の裏)
-    d = run_base * 0.7  # Run vs Run   (ラン徹底警戒)
-
-    # 3. ナッシュ均衡の分母を計算
+    ユーザーが入力した4つの利得（a, b, c, d）から
+    混合戦略ナッシュ均衡と、4パターンの発生確率を計算する
+    """
+    # 一次条件の解を導くための分母
+    # 提示例: (3 - 15) - (8 - 2) = -12 - 6 = -18
     denominator = (a - b) - (c - d)
 
     if denominator == 0:
-        return (50.0, 50.0), (50.0, 50.0)
+        # 分母が0（極端なデータ）の場合は均等配分を返す
+        return {
+            "off_pass": 50.0, "off_run": 50.0,
+            "def_pass": 50.0, "def_run": 50.0,
+            "p_pass_pass": 25.0, "p_pass_run": 25.0,
+            "p_run_pass": 25.0, "p_run_run": 25.0
+        }
 
-    # 4. オフェンスの最適なパス比率 Pa
-    off_pass_ratio = ((d - c) / denominator) * 100
+    # 1. オフェンスの最適なパス比率 Pa
+    # 提示例: (2 - 8) / -18 = -6 / -18 = 1/3 (33.3%)
+    off_pass_ratio = ((d - c) / denominator)
+    off_pass_ratio = max(0.0, min(100.0, off_pass_ratio * 100))
     off_run_ratio = 100.0 - off_pass_ratio
 
-    # 5. ディフェンスの最適なパス警戒比率 Pb
-    def_pass_ratio = ((d - b) / denominator) * 100
+    # 2. ディフェンスの最適なパス警戒比率 Pb
+    # 提示例: (2 - 15) / -18 = -13 / -18 = 13/18 (72.2%)
+    def_pass_ratio = ((d - b) / denominator)
+    def_pass_ratio = max(0.0, min(100.0, def_pass_ratio * 100))
     def_run_ratio = 100.0 - def_pass_ratio
 
-    # 0%〜100%の間に収めるためのクリップ処理
-    off_pass_ratio = max(0.0, min(100.0, off_pass_ratio))
-    off_run_ratio = 100.0 - off_pass_ratio
+    # 3. 4つのシチュエーションがそれぞれ発生する確率（交差確率）
+    pa = off_pass_ratio / 100.0
+    pb = def_pass_ratio / 100.0
 
-    def_pass_ratio = max(0.0, min(100.0, def_pass_ratio))
-    def_run_ratio = 100.0 - def_pass_ratio
+    p_pass_pass = pa * pb * 100          # Pass vs Pass (例: 1/3 * 13/18 = 13/54)
+    p_pass_run  = pa * (1 - pb) * 100    # Pass vs Run  (例: 1/3 *  5/18 =  5/54)
+    p_run_pass  = (1 - pa) * pb * 100    # Run vs Pass  (例: 2/3 * 13/18 = 26/54)
+    p_run_run   = (1 - pa) * (1 - pb) * 100  # Run vs Run   (例: 2/3 *  5/18 = 10/54)
 
-    return (
-        (round(off_pass_ratio, 1), round(off_run_ratio, 1)),
-        (round(def_pass_ratio, 1), round(def_run_ratio, 1)),
-    )
-
+    return {
+        "off_pass": round(off_pass_ratio, 1),
+        "off_run": round(off_run_ratio, 1),
+        "def_pass": round(def_pass_ratio, 1),
+        "def_run": round(def_run_ratio, 1),
+        "p_pass_pass": round(p_pass_pass, 1),
+        "p_pass_run": round(p_pass_run, 1),
+        "p_run_pass": round(p_run_pass, 1),
+        "p_run_run": round(p_run_run, 1)
+    }
 
 app = Flask(__name__)
-
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -57,28 +59,18 @@ def index():
 
     if request.method == "POST":
         try:
-            off_pass = float(request.form.get("off_pass", "0"))
-            off_run = float(request.form.get("off_run", "0"))
-            def_pass = float(request.form.get("def_pass_allowed", "0"))
-            def_run = float(request.form.get("def_run_allowed", "0"))
+            # 4つの利得表の値を直接取得
+            a = float(request.form.get("gain_a", "0"))
+            b = float(request.form.get("gain_b", "0"))
+            c = float(request.form.get("gain_c", "0"))
+            d = float(request.form.get("gain_d", "0"))
 
-            off_ratio, def_ratio = calculate_game_theory_ratio(
-                off_pass, off_run, def_pass, def_run
-            )
-
-            # 📝 タイポがあった行を綺麗に修正しました
-            result = {
-                "off_pass": off_ratio[0],
-                "off_run": off_ratio[1],
-                "def_pass": def_ratio[0],
-                "def_run": def_ratio[1],
-            }
+            result = calculate_nash_and_scenarios(a, b, c, d)
 
         except ValueError:
-            error = "数値を正しく入力してください。"
+            error = "Please enter valid numeric values."
 
     return render_template("index.html", result=result, error=error)
-
 
 if __name__ == "__main__":
     app.run(debug=True)

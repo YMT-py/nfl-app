@@ -8,36 +8,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
     <style>
-        /* NFL Official Colors: Navy (#013369), Red (#D50A0A), Slate (#101820) */
         body { padding: 10px; background-color: #f4f6f9; font-family: 'Roboto', sans-serif; color: #101820; }
         .container { max-width: 800px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-top: 10px; border-top: 6px solid #013369; }
         
         h1 { text-align: center; color: #013369; margin-bottom: 5px; font-size: 2.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        .subtitle { text-align: center; color: #627d98; font-size: 1.2rem; margin-bottom: 25px; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px; }
+        .subtitle { text-align: center; color: #627d98; font-size: 1.2rem; margin-bottom: 25px; text-transform: uppercase; font-weight: bold; }
         
-        .result-box { background-color: #ffffff; border: 2px solid #013369; padding: 25px; border-radius: 8px; margin-top: 30px; box-shadow: 0 4px 6px rgba(1, 51, 105, 0.05); }
+        .result-box { background-color: #ffffff; border: 2px solid #013369; padding: 25px; border-radius: 8px; margin-top: 30px; }
         .error-box { background-color: #fff5f5; border-left: 5px solid #D50A0A; padding: 15px; border-radius: 4px; color: #c53030; }
         
-        /* Layout Grid */
         .grid-2 { display: grid; grid-template-columns: 1fr; gap: 20px; }
         fieldset { border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 10px; background-color: #fafbfc; }
-        
-        /* Form Headers */
-        fieldset legend { color: #013369; font-weight: bold; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 10px; }
+        fieldset legend { color: #013369; font-weight: bold; font-size: 1.5rem; text-transform: uppercase; padding: 0 10px; }
 
         label { margin-bottom: 6px; font-size: 1.3rem; color: #486581; font-weight: 600; }
         input[type="number"] { margin-bottom: 15px; height: 4.4rem; font-size: 1.6rem; background-color: white; border: 1px solid #cbd5e0; border-radius: 6px; }
-        input[type="number"]:focus { border-color: #013369; box-shadow: 0 0 0 2px rgba(1, 51, 105, 0.2); }
         
-        /* NFL Red Accent Button */
-        .btn-calc { width: 100%; margin-top: 10px; height: 5.0rem; font-size: 1.6rem; background-color: #D50A0A; border-color: #D50A0A; font-weight: bold; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s; }
+        .btn-calc { width: 100%; margin-top: 10px; height: 5.0rem; font-size: 1.6rem; background-color: #D50A0A; border-color: #D50A0A; font-weight: bold; border-radius: 6px; text-transform: uppercase; }
         .btn-calc:hover { background-color: #b30808; border-color: #b30808; }
 
-        /* Strategy Output Text Colors */
         h4 { margin-top: 10px; margin-bottom: 15px; font-size: 1.8rem; padding-bottom: 8px; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
         .offense-title { color: #013369; }
         .defense-title { color: #486581; }
-        .stat-value { font-size: 2.4rem; font-weight: bold; color: #101820; }
+        .stat-value { font-size: 2.4rem; font-weight: bold; color: #013369; }
+
+        /* Matrix Table Style */
+        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .matrix-table th, .matrix-table td { border: 1px solid #cbd5e0; padding: 12px; text-align: center; }
+        .matrix-table th { background-color: #f4f6f9; color: #013369; font-weight: bold; text-transform: uppercase; }
+        .probability-highlight { font-size: 1.8rem; font-weight: bold; color: #D50A0A; }
 
         @media (min-width: 600px) {
             body { padding: 30px; }
@@ -59,49 +58,89 @@
 
     <form method="POST">
         <div class="grid-2">
+            <!-- OFFENSE: PASS PAYOFFS -->
             <fieldset>
-                <legend>Offense Stats</legend>
-                <label for="off_pass">Passing Yards per Attempt (Y/A)</label>
-                <input type="number" step="0.1" name="off_pass" id="off_pass" value="{{ request.form.get('off_pass', '') }}" placeholder="e.g. 7.2" required>
+                <legend>Pass Play Payoffs</legend>
+                <label for="gain_a">Pass vs Pass Cover (a)</label>
+                <input type="number" step="0.1" name="gain_a" id="gain_a" value="{{ request.form.get('gain_a', '') }}" placeholder="e.g. 3" required>
 
-                <label for="off_run">Rushing Yards per Attempt (Y/A)</label>
-                <input type="number" step="0.1" name="off_run" id="off_run" value="{{ request.form.get('off_run', '') }}" placeholder="e.g. 4.5" required>
+                <label for="gain_b">Pass vs Run Contain (b)</label>
+                <input type="number" step="0.1" name="gain_b" id="gain_b" value="{{ request.form.get('gain_b', '') }}" placeholder="e.g. 15" required>
             </fieldset>
 
+            <!-- OFFENSE: RUN PAYOFFS -->
             <fieldset>
-                <legend>Defense Stats</legend>
-                <label for="def_pass_allowed">Passing Yards Allowed per Att</label>
-                <input type="number" step="0.1" name="def_pass_allowed" id="def_pass_allowed" value="{{ request.form.get('def_pass_allowed', '') }}" placeholder="e.g. 6.8" required>
+                <legend>Run Play Payoffs</legend>
+                <label for="gain_c">Run vs Pass Cover (c)</label>
+                <input type="number" step="0.1" name="gain_c" id="gain_c" value="{{ request.form.get('gain_c', '') }}" placeholder="e.g. 8" required>
 
-                <label for="def_run_allowed">Rushing Yards Allowed per Att</label>
-                <input type="number" step="0.1" name="def_run_allowed" id="def_run_allowed" value="{{ request.form.get('def_run_allowed', '') }}" placeholder="e.g. 4.1" required>
+                <label for="gain_d">Run vs Run Contain (d)</label>
+                <input type="number" step="0.1" name="gain_d" id="gain_d" value="{{ request.form.get('gain_d', '') }}" placeholder="e.g. 2" required>
             </fieldset>
         </div>
 
         <button type="submit" class="button btn-calc">Calculate Nash Equilibrium</button>
     </form>
 
+    <!-- RESULTS -->
     {% if result %}
         <div class="result-box">
-            <h3 style="font-size: 2.2rem; margin-bottom: 15px; color: #013369; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">📊 Optimal Strategy Ratios</h3>
+            <h3 style="font-size: 2.2rem; margin-bottom: 15px; color: #013369; font-weight: 700; text-transform: uppercase;">📊 Optimal Strategy Ratios</h3>
+            
             <div class="grid-2" style="margin-top: 20px;">
                 <div>
-                    <h4 class="offense-title">Offense Call</h4>
+                    <h4 class="offense-title">Offense Call (Pa)</h4>
                     <ul style="list-style: none; margin-left: 0; padding-left: 5px;">
-                        <li style="margin-bottom: 8px; color: #486581;">Pass Ratio: <span class="stat-value" style="color: #013369;">{{ result.off_pass }}%</span></li>
-                        <li style="color: #486581;">Run Ratio: <span class="stat-value" style="color: #013369;">{{ result.off_run }}%</span></li>
+                        <li style="margin-bottom: 8px; color: #486581;">Pass Ratio: <span class="stat-value">{{ result.off_pass }}%</span></li>
+                        <li style="color: #486581;">Run Ratio: <span class="stat-value">{{ result.off_run }}%</span></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="defense-title">Defense Alignment</h4>
+                    <h4 class="defense-title">Defense Alignment (Pb)</h4>
                     <ul style="list-style: none; margin-left: 0; padding-left: 5px;">
-                        <li style="margin-bottom: 8px; color: #486581;">Pass Coverage: <span class="stat-value">{{ result.def_pass }}%</span></li>
-                        <li style="color: #486581;">Run Contain: <span class="stat-value">{{ result.def_run }}%</span></li>
+                        <li style="margin-bottom: 8px; color: #486581;">Pass Coverage: <span class="stat-value" style="color: #486581;">{{ result.def_pass }}%</span></li>
+                        <li style="color: #486581;">Run Contain: <span class="stat-value" style="color: #486581;">{{ result.def_run }}%</span></li>
                     </ul>
                 </div>
             </div>
+
+            <h4 style="margin-top: 30px; color: #101820;">🎲 Scenario Occurrence Probability Matrix</h4>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Offense \ Defense</th>
+                        <th>Pass Cover ({{ result.def_pass }}%)</th>
+                        <th>Run Contain ({{ result.def_run }}%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-weight: bold;">Pass ({{ result.off_pass }}%)</td>
+                        <td>
+                            <div>Pass vs Pass</div>
+                            <div class="probability-highlight">{{ result.p_pass_pass }}%</div>
+                        </td>
+                        <td>
+                            <div>Pass vs Run</div>
+                            <div class="probability-highlight">{{ result.p_pass_run }}%</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold;">Run ({{ result.off_run }}%)</td>
+                        <td>
+                            <div>Run vs Pass</div>
+                            <div class="probability-highlight">{{ result.p_run_pass }}%</div>
+                        </td>
+                        <td>
+                            <div>Run vs Run</div>
+                            <div class="probability-highlight">{{ result.p_run_run }}%</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
             <p style="font-size: 1.2rem; color: #627d98; margin-top: 25px; font-style: italic; line-height: 1.6; border-top: 1px solid #e2e8f0; padding-top: 15px;">
-                * Mixing plays at these optimal ratios prevents the opponent from predicting and exploiting your tactical tendencies, achieving the mathematical Nash Equilibrium.
+                * The scenario with the highest probability represents the strategic focus area determined by the asymmetric payoffs of pass and run plays.
             </p>
         </div>
     {% endif %}
