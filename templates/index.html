@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFL Stats Simulator - Neutral Pro</title>
+    <title>NFL Stats Simulator - Game Theory Pro</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #0f141c; /* NFLの伝統的な深いネイビーを混ぜたダーク背景 */
+            background-color: #0f141c;
             color: #e2e8f0;
             max-width: 900px;
             margin: 40px auto;
@@ -15,7 +15,7 @@
         }
 
         .container {
-            background-color: #17202e; /* 統一感のあるダークネイビーのカード */
+            background-color: #17202e;
             padding: 40px;
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.6);
@@ -40,7 +40,7 @@
             max-width: 600px;
             margin: 0 auto 40px auto;
             padding-bottom: 20px;
-            border-bottom: 2px solid #013369; /* NFL公式シールドネイビーのライン */
+            border-bottom: 2px solid #013369;
         }
 
         .stats-grid {
@@ -58,13 +58,13 @@
         }
 
         h3 {
-            color: #ffffff; /* 特定のチームカラーではなくすっきりしたホワイト */
+            color: #ffffff;
             margin-top: 0;
             margin-bottom: 20px;
             font-size: 18px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-left: 4px solid #d50a0a; /* NFLロゴのレッドをワンポイントのアクセントに */
+            border-left: 4px solid #d50a0a;
             padding-left: 10px;
         }
 
@@ -94,7 +94,7 @@
 
         input[type="number"]:focus {
             outline: none;
-            border-color: #013369; /* フォーカス時はNFLネイビー */
+            border-color: #013369;
             box-shadow: 0 0 0 3px rgba(1, 51, 105, 0.4);
         }
 
@@ -105,7 +105,6 @@
         button {
             width: 100%;
             padding: 15px;
-            /* NFL公式のブルー・ネイビー系グラデーション */
             background: linear-gradient(135deg, #013369 0%, #002244 100%);
             color: white;
             border: 1px solid #024486;
@@ -144,27 +143,39 @@
             padding: 25px;
             background-color: #1e293b;
             border-radius: 8px;
-            border-left: 5px solid #013369; /* 左端のラインもNFLネイビーに */
-            text-align: center;
+            border-left: 5px solid #013369;
             border-top: 1px solid #334155;
             border-right: 1px solid #334155;
             border-bottom: 1px solid #334155;
         }
 
+        .result-row {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #334155;
+        }
+        .result-row:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
         .result-title {
             color: #94a3b8;
             text-transform: uppercase;
-            font-size: 14px;
-            margin-bottom: 10px;
+            font-size: 13px;
+            margin-bottom: 5px;
             letter-spacing: 1px;
+            text-align: left;
         }
 
         .result-value {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 800;
             color: #ffffff;
             margin: 0;
             letter-spacing: 0.5px;
+            text-align: left;
         }
     </style>
 </head>
@@ -174,7 +185,7 @@
         <h1>NFL Stats Simulator</h1>
         
         <div class="description">
-            Input the offensive stats for Team A and the defensive stats allowed for Team B to calculate the optimal play calling ratio based on team efficiency.
+            Calculate the Nash Equilibrium play-calling and defensive strategy based on game theory and team efficiency.
         </div>
         
         <form action="/" method="POST">
@@ -183,31 +194,25 @@
             {% endif %}
 
             <div class="stats-grid">
-                <!-- Offense Column -->
                 <div class="stats-group">
                     <h3>Offense (Team A)</h3>
                     <div class="form-group">
-                        <!-- 📝 Yards/Game から Yards per Pass Attempt に変更 -->
                         <label for="off_pass">Yards per Pass Attempt</label>
                         <input type="number" name="off_pass" id="off_pass" step="0.1" placeholder="0.0" required>
                     </div>
                     <div class="form-group">
-                        <!-- 📝 Yards/Game から Yards per Rush Attempt に変更 -->
                         <label for="off_run">Yards per Rush Attempt</label>
                         <input type="number" name="off_run" id="off_run" step="0.1" placeholder="0.0" required>
                     </div>
                 </div>
 
-                <!-- Defense Column -->
                 <div class="stats-group">
                     <h3>Defense (Team B)</h3>
                     <div class="form-group">
-                        <!-- 📝 Pass Yards Allowed/Game から Pass Yards Allowed per Attempt に変更 -->
                         <label for="def_pass_allowed">Pass Yards Allowed per Attempt</label>
                         <input type="number" name="def_pass_allowed" id="def_pass_allowed" step="0.1" placeholder="0.0" required>
                     </div>
                     <div class="form-group">
-                        <!-- 📝 Run Yards Allowed/Game から Rush Yards Allowed per Attempt に変更 -->
                         <label for="def_run_allowed">Rush Yards Allowed per Attempt</label>
                         <input type="number" name="def_run_allowed" id="def_run_allowed" step="0.1" placeholder="0.0" required>
                     </div>
@@ -219,10 +224,18 @@
 
         {% if result %}
         <div class="result-container">
-            <div class="result-title">Optimal Play Ratio</div>
-            <p class="result-value">
-                PASS: {{ result.pass }}%  |  RUN: {{ result.run }}%
-            </p>
+            <div class="result-row">
+                <div class="result-title">Optimal Offense Call (Team A)</div>
+                <p class="result-value">
+                    PASS: {{ result.off_pass }}%  |  RUN: {{ result.off_run }}%
+                </p>
+            </div>
+            <div class="result-row">
+                <div class="result-title">Optimal Defense Alignment (Team B)</div>
+                <p class="result-value">
+                    PASS DEFENSE: {{ result.def_pass }}%  |  RUN DEFENSE: {{ result.def_run }}%
+                </p>
+            </div>
         </div>
         {% endif %}
     </div>
