@@ -15,7 +15,7 @@
         .subtitle { text-align: center; color: #627d98; font-size: 1.2rem; margin-bottom: 25px; text-transform: uppercase; font-weight: bold; }
         
         .result-box { background-color: #ffffff; border: 2px solid #013369; padding: 25px; border-radius: 8px; margin-top: 30px; }
-        .error-box { background-color: #fff5f5; border-left: 5px solid #D50A0A; padding: 15px; border-radius: 4px; color: #c53030; }
+        .error-box { background-color: #fff5f5; border-left: 5px solid #D50A0A; padding: 15px; border-radius: 4px; color: #c53030; font-weight: 600; margin-bottom: 20px; }
         
         .grid-2 { display: grid; grid-template-columns: 1fr; gap: 20px; }
         fieldset { border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 10px; background-color: #fafbfc; }
@@ -32,7 +32,6 @@
         .defense-title { color: #486581; }
         .stat-value { font-size: 2.4rem; font-weight: bold; color: #013369; }
 
-        /* Matrix Table Style */
         .matrix-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .matrix-table th, .matrix-table td { border: 1px solid #cbd5e0; padding: 12px; text-align: center; }
         .matrix-table th { background-color: #f4f6f9; color: #013369; font-weight: bold; text-transform: uppercase; }
@@ -53,12 +52,11 @@
     <div class="subtitle">Game Theory & Nash Equilibrium Analytics</div>
 
     {% if error %}
-        <div class="error-box">⚠️ {{ error }}</div>
+        <div class="error-box">ERROR: {{ error }}</div>
     {% endif %}
 
     <form method="POST">
         <div class="grid-2">
-            <!-- OFFENSE: PASS PAYOFFS -->
             <fieldset>
                 <legend>Pass Play Payoffs</legend>
                 <label for="gain_a">Pass vs Pass Cover (a)</label>
@@ -68,7 +66,6 @@
                 <input type="number" step="0.1" name="gain_b" id="gain_b" value="{{ request.form.get('gain_b', '') }}" placeholder="e.g. 15" required>
             </fieldset>
 
-            <!-- OFFENSE: RUN PAYOFFS -->
             <fieldset>
                 <legend>Run Play Payoffs</legend>
                 <label for="gain_c">Run vs Pass Cover (c)</label>
@@ -82,24 +79,23 @@
         <button type="submit" class="button btn-calc">Calculate Nash Equilibrium</button>
     </form>
 
-    <!-- RESULTS -->
     {% if result %}
         <div class="result-box">
             <h3 style="font-size: 2.2rem; margin-bottom: 15px; color: #013369; font-weight: 700; text-transform: uppercase;">📊 Optimal Strategy Ratios</h3>
             
             <div class="grid-2" style="margin-top: 20px;">
                 <div>
-                    <h4 class="offense-title">Offense Call (Pa)</h4>
+                    <h4 class="offense-title">Offense Call</h4>
                     <ul style="list-style: none; margin-left: 0; padding-left: 5px;">
                         <li style="margin-bottom: 8px; color: #486581;">Pass Ratio: <span class="stat-value">{{ result.off_pass }}%</span></li>
                         <li style="color: #486581;">Run Ratio: <span class="stat-value">{{ result.off_run }}%</span></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="defense-title">Defense Alignment (Pb)</h4>
+                    <h4 class="defense-title">Defense Alignment</h4>
                     <ul style="list-style: none; margin-left: 0; padding-left: 5px;">
                         <li style="margin-bottom: 8px; color: #486581;">Pass Coverage: <span class="stat-value" style="color: #486581;">{{ result.def_pass }}%</span></li>
-                        <li style="color: #486581;">Run Contain: <span class="stat-value" style="color: #486581;">{{ result.def_run }}%</span></li>
+                        <li style="color: #486581;">Run Contain: <span class="stat-value">{{ result.def_run }}%</span></li>
                     </ul>
                 </div>
             </div>
