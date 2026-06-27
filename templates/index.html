@@ -32,6 +32,11 @@
         .defense-title { color: #486581; }
         .stat-value { font-size: 2.4rem; font-weight: bold; color: #013369; }
 
+        /* Expected Yards Box Style */
+        .expected-yards-box { background-color: #013369; color: white; padding: 15px 20px; border-radius: 6px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .expected-yards-title { font-weight: bold; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .expected-yards-value { font-size: 2.6rem; font-weight: 700; color: #ffffff; }
+
         .matrix-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         .matrix-table th, .matrix-table td { border: 1px solid #cbd5e0; padding: 12px; text-align: center; }
         .matrix-table th { background-color: #f4f6f9; color: #013369; font-weight: bold; text-transform: uppercase; }
@@ -57,6 +62,7 @@
 
     <form method="POST">
         <div class="grid-2">
+            <!-- OFFENSE: PASS PAYOFFS -->
             <fieldset>
                 <legend>Pass Play Payoffs</legend>
                 <label for="gain_a">Pass vs Pass Cover (a)</label>
@@ -66,6 +72,7 @@
                 <input type="number" step="0.1" name="gain_b" id="gain_b" value="{{ request.form.get('gain_b', '') }}" placeholder="e.g. 15" required>
             </fieldset>
 
+            <!-- OFFENSE: RUN PAYOFFS -->
             <fieldset>
                 <legend>Run Play Payoffs</legend>
                 <label for="gain_c">Run vs Pass Cover (c)</label>
@@ -79,6 +86,7 @@
         <button type="submit" class="button btn-calc">Calculate Nash Equilibrium</button>
     </form>
 
+    <!-- RESULTS -->
     {% if result %}
         <div class="result-box">
             <h3 style="font-size: 2.2rem; margin-bottom: 15px; color: #013369; font-weight: 700; text-transform: uppercase;">📊 Optimal Strategy Ratios</h3>
@@ -98,6 +106,12 @@
                         <li style="color: #486581;">Run Contain: <span class="stat-value">{{ result.def_run }}%</span></li>
                     </ul>
                 </div>
+            </div>
+
+            <!-- 🏈 予想獲得ヤード数の表示ボックスを追加 -->
+            <div class="expected-yards-box">
+                <span class="expected-yards-title">🏈 Expected Yards per Play</span>
+                <span class="expected-yards-value">{{ result.expected_yards }} yds</span>
             </div>
 
             <h4 style="margin-top: 30px; color: #101820;">🎲 Scenario Occurrence Probability Matrix</h4>
