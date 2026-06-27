@@ -1,244 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFL Stats Simulator - Game Theory Pro</title>
+    <title>NFL プレイコール・シミュレーター</title>
+    <!-- シンプルで見やすいスタイリング（Milligramを使用） -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
     <style>
-        body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: #0f141c;
-            color: #e2e8f0;
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 30px;
-        }
-
-        .container {
-            background-color: #17202e;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-            border: 1px solid #243249;
-        }
-
-        h1 {
-            color: #ffffff;
-            text-align: center;
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        .description {
-            text-align: center;
-            color: #94a3b8;
-            font-size: 15px;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto 40px auto;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #013369;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .stats-group {
-            background-color: #1e293b;
-            padding: 25px;
-            border-radius: 8px;
-            border: 1px solid #334155;
-        }
-
-        h3 {
-            color: #ffffff;
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 18px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-left: 4px solid #d50a0a;
-            padding-left: 10px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            color: #94a3b8;
-        }
-
-        input[type="number"] {
-            width: 100%;
-            padding: 12px;
-            background-color: #0f141c;
-            border: 1px solid #475569;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: border-color 0.3s, box-shadow 0.3s;
-        }
-
-        input[type="number"]:focus {
-            outline: none;
-            border-color: #013369;
-            box-shadow: 0 0 0 3px rgba(1, 51, 105, 0.4);
-        }
-
-        input[type="number"]::placeholder {
-            color: #475569;
-        }
-
-        button {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #013369 0%, #002244 100%);
-            color: white;
-            border: 1px solid #024486;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(1, 51, 105, 0.3);
-            transition: background 0.2s, transform 0.1s;
-        }
-
-        button:hover {
-            background: linear-gradient(135deg, #024486 0%, #013369 100%);
-            box-shadow: 0 6px 20px rgba(1, 51, 105, 0.5);
-        }
-
-        button:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 10px rgba(1, 51, 105, 0.3);
-        }
-
-        .error-message {
-            color: #f87171;
-            background-color: rgba(248, 113, 113, 0.1);
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            text-align: center;
-            border: 1px solid rgba(248, 113, 113, 0.2);
-        }
-
-        .result-container {
-            margin-top: 30px;
-            padding: 25px;
-            background-color: #1e293b;
-            border-radius: 8px;
-            border-left: 5px solid #013369;
-            border-top: 1px solid #334155;
-            border-right: 1px solid #334155;
-            border-bottom: 1px solid #334155;
-        }
-
-        .result-row {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px dashed #334155;
-        }
-        .result-row:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-
-        .result-title {
-            color: #94a3b8;
-            text-transform: uppercase;
-            font-size: 13px;
-            margin-bottom: 5px;
-            letter-spacing: 1px;
-            text-align: left;
-        }
-
-        .result-value {
-            font-size: 24px;
-            font-weight: 800;
-            color: #ffffff;
-            margin: 0;
-            letter-spacing: 0.5px;
-            text-align: left;
-        }
+        body { padding: 20px; background-color: #f4f5f6; }
+        .container { max-width: 800px; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
+        .result-box { background-color: #f0f7f4; border-left: 5px solid #46a070; padding: 20px; border-radius: 4px; margin-top: 30px; }
+        .error-box { background-color: #fff0f0; border-left: 5px solid #e05a5a; padding: 15px; border-radius: 4px; color: #c0392b; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        fieldset { border: 1px solid #e1e1e1; padding: 20px; border-radius: 6px; margin-bottom: 20px; }
+        legend { font-weight: bold; padding: 0 10px; color: #555; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>NFL Stats Simulator</h1>
-        
-        <div class="description">
-            Calculate the Nash Equilibrium play-calling and defensive strategy based on game theory and team efficiency.
+<div class="container">
+    <h1>🏈 NFL プレイコール・シミュレーター</h1>
+
+    {% if error %}
+        <div class="error-box">⚠️ {{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+        <div class="grid-2">
+            <!-- オフェンス入力 -->
+            <fieldset>
+                <legend>OFFENSE (自チームの攻撃力)</legend>
+                <label for="off_pass">1回あたりの獲得パスヤード (Y/A)</label>
+                <input type="number" step="0.1" name="off_pass" id="off_pass" value="{{ request.form.get('off_pass', '') }}" placeholder="例: 7.2" required>
+
+                <label for="off_run">1回あたりの獲得ランヤード (Y/A)</label>
+                <input type="number" step="0.1" name="off_run" id="off_run" value="{{ request.form.get('off_run', '') }}" placeholder="例: 4.5" required>
+            </fieldset>
+
+            <!-- ディフェンス入力 -->
+            <fieldset>
+                <legend>DEFENSE (相手チームの守備力)</legend>
+                <label for="def_pass_allowed">1回あたりの喪失パスヤード (Y/A)</label>
+                <input type="number" step="0.1" name="def_pass_allowed" id="def_pass_allowed" value="{{ request.form.get('def_pass_allowed', '') }}" placeholder="例: 6.8" required>
+
+                <label for="def_run_allowed">1回あたりの喪失ランヤード (Y/A)</label>
+                <input type="number" step="0.1" name="def_run_allowed" id="def_run_allowed" value="{{ request.form.get('def_run_allowed', '') }}" placeholder="例: 4.1" required>
+            </fieldset>
         </div>
-        
-        <form action="/" method="POST">
-            {% if error %}
-            <div class="error-message">{{ error }}</div>
-            {% endif %}
 
-            <div class="stats-grid">
-                <div class="stats-group">
-                    <h3>Offense (Team A)</h3>
-                    <div class="form-group">
-                        <label for="off_pass">Yards per Pass Attempt</label>
-                        <input type="number" name="off_pass" id="off_pass" step="0.1" placeholder="0.0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="off_run">Yards per Rush Attempt</label>
-                        <input type="number" name="off_run" id="off_run" step="0.1" placeholder="0.0" required>
-                    </div>
+        <button type="submit" class="button-primary" style="width: 100%; margin-top: 10px;">ナッシュ均衡を計算する</button>
+    </form>
+
+    <!-- 計算結果の表示 -->
+    {% if result %}
+        <div class="result-box">
+            <h3>📊 計算結果（ゲーム理論による最適比率）</h3>
+            <hr>
+            <div class="grid-2">
+                <div>
+                    <h4>オフェンス (推奨プレイコール)</h4>
+                    <ul>
+                        <li><strong>パス比率:</strong> <span style="font-size: 1.2rem; color: #9b4dca;">{{ result.off_pass }}%</span></li>
+                        <li><strong>ラン比率:</strong> <span style="font-size: 1.2rem; color: #9b4dca;">{{ result.off_run }}%</span></li>
+                    </ul>
                 </div>
-
-                <div class="stats-group">
-                    <h3>Defense (Team B)</h3>
-                    <div class="form-group">
-                        <label for="def_pass_allowed">Pass Yards Allowed per Attempt</label>
-                        <input type="number" name="def_pass_allowed" id="def_pass_allowed" step="0.1" placeholder="0.0" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="def_run_allowed">Rush Yards Allowed per Attempt</label>
-                        <input type="number" name="def_run_allowed" id="def_run_allowed" step="0.1" placeholder="0.0" required>
-                    </div>
+                <div>
+                    <h4>ディフェンス (推奨守備警戒)</h4>
+                    <ul>
+                        <li><strong>パス警戒:</strong> <span style="font-size: 1.2rem; color: #46a070;">{{ result.def_pass }}%</span></li>
+                        <li><strong>ラン警戒:</strong> <span style="font-size: 1.2rem; color: #46a070;">{{ result.def_run }}%</span></li>
+                    </ul>
                 </div>
             </div>
-
-            <button type="submit">Calculate Optimal Ratio</button>
-        </form>
-
-        {% if result %}
-        <div class="result-container">
-            <div class="result-row">
-                <div class="result-title">Optimal Offense Call (Team A)</div>
-                <p class="result-value">
-                    PASS: {{ result.off_pass }}%  |  RUN: {{ result.off_run }}%
-                </p>
-            </div>
-            <div class="result-row">
-                <div class="result-title">Optimal Defense Alignment (Team B)</div>
-                <p class="result-value">
-                    PASS DEFENSE: {{ result.def_pass }}%  |  RUN DEFENSE: {{ result.def_run }}%
-                </p>
-            </div>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 15px; font-style: italic;">
+                ※お互いがこの比率をランダムに混ぜてコールすることが、理論上最もスタッツを裏切らない（損をしない）戦略になります。
+            </p>
         </div>
-        {% endif %}
-    </div>
+    {% endif %}
+</div>
 
 </body>
 </html>
