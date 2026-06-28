@@ -39,25 +39,30 @@ def handle_pure_strategy(a, b, c, d):
         }
 
 def calculate_nash_and_scenarios(a, b, c, d):
-    """混合戦略を優先し、成立しない場合に純粋戦略を返すロジック"""
+    """
+    混合戦略を優先し、成立しない場合にのみ純粋戦略を返すロジック
+    """
     denominator = (a - b) - (c - d)
-    
-    if denominator == 0:
-        return handle_pure_strategy(a, b, c, d)
 
-    pa = (d - c) / denominator
-    pb = (d - b) / denominator
+    # 1. 混合戦略の計算 (ガード処理なし)
+    if denominator != 0:
+        pa = (d - c) / denominator
+        pb = (d - b) / denominator
+        
+        # 混合戦略が数学的に成立する範囲(0 < p < 1)ならそれを採用
+        if 0 < pa < 1 and 0 < pb < 1:
+            exp_yards = pa * (a * pb + b * (1.0 - pb)) + (1.0 - pa) * (c * pb + d * (1.0 - pb))
+            
+            return {
+                "strategy": "Mixed Strategy",
+                "off_pass": round(pa * 100, 1),
+                "off_run": round((1.0 - pa) * 100, 1),
+                "def_pass": round(pb * 100, 1),
+                "def_run": round((1.0 - pb) * 100, 1),
+                "expected_yards": round(exp_yards, 1)
+            }
 
-    # 混合戦略が成立する範囲 (0 < p < 1) かどうかの判定
-    if 0 < pa < 1 and 0 < pb < 1:
-        exp_yards = pa * (a * pb + b * (1.0 - pb)) + (1.0 - pa) * (c * pb + d * (1.0 - pb))
-        return {
-            "strategy": "Mixed Strategy",
-            "off_pass": round(pa * 100, 1),
-            "off_run": round((1.0 - pa) * 100, 1),
-            "expected_yards": round(exp_yards, 1)
-        }
-    
+    # 2. 混合戦略が成立しない（範囲外）場合は純粋戦略へ分岐
     return handle_pure_strategy(a, b, c, d)
 
 @app.route('/', methods=['GET', 'POST'])
