@@ -30,57 +30,71 @@ def load_team_stats_json(offense_team):
 
 def calculate_nash_and_scenarios(a, b, c, d):
     """
-    ナッシュ均衡とシナリオ確率を計算する関数。
-    計算結果が 0%〜100% の範囲を超えた場合、自動的に純粋戦略（ガード機能）へ切り替えます。
+    純粋戦略（鞍点）の探索機能を備えたナッシュ均衡計算関数
     """
     denominator = (a - b) - (c - d)
 
-    # 分母が0（完全に並行な利得）の場合のセーフティ
-    if denominator == 0:
-        exp_yards = (a + b + c + d) / 4.0
+    # 1. 混合戦略の計算を試みる
+    if denominator != 0:
+        pa = (d - c) / denominator
+        pb = (d - b) / denominator
+
+        # 混合戦略が成立する条件: 0 < p < 1
+        if 0 < pa < 1 and 0 < pb < 1:
+            # 混合戦略が有効な場合
+            off_pass = pa * 100
+            off_run = (1.0 - pa) * 100
+            def_pass = pb * 100
+            def_run = (1.0 - pb) * 100
+            
+            # 期待利得の再計算
+            exp_yards = pa * (a * pb + b * (1.0 - pb)) + (1.0 - pa) * (c * pb + d * (1.0 - pb))
+            
+            return {
+                "off_pass": round(off_pass, 1), "off_run": round(off_run, 1),
+                "def_pass": round(def_pass, 1), "def_run": round(def_run, 1),
+                "p_pass_pass": round(pa * pb * 100, 1),
+                "p_pass_run": round(pa * (1.0 - pb) * 100, 1),
+                "p_run_pass": round((1.0 - pa) * pb * 100, 1),
+                "p_run_run": round((1.0 - pa) * (1.0 - pb) * 100, 1),
+                "expected_yards": round(exp_yards, 1),
+                "strategy": "Mixed Strategy"
+            }
+
+    # 2. 純粋戦略（支配戦略）の探索
+    # オフェンスのパス期待値とラン期待値の比較
+    # マクシミン基準（最悪の場合を想定して、その中で一番マシなものを選ぶ）
+    # パスを選んだ時の最悪: min(a, b) / ランを選んだ時の最悪: min(c, d)
+    
+    payoff_pass_if_def_pass = a
+    payoff_pass_if_def_run = b
+    payoff_run_if_def_pass = c
+    payoff_run_if_def_run = d
+
+    # オフェンスにとってのマクシミン
+    min_if_pass = min(payoff_pass_if_def_pass, payoff_pass_if_def_run)
+    min_if_run = min(payoff_run_if_def_pass, payoff_run_if_def_run)
+
+    if min_if_pass >= min_if_run:
+        # パスが支配的
         return {
-            "off_pass": 50.0, "off_run": 50.0,
-            "def_pass": 50.0, "def_run": 50.0,
-            "p_pass_pass": 25.0, "p_pass_run": 25.0,
-            "p_run_pass": 25.0, "p_run_run": 25.0,
-            "expected_yards": round(exp_yards, 1)
+            "off_pass": 100.0, "off_run": 0.0,
+            "def_pass": 100.0, "def_run": 0.0,
+            "p_pass_pass": 100.0, "p_pass_run": 0.0,
+            "p_run_pass": 0.0, "p_run_run": 0.0,
+            "expected_yards": float(min(a, b)),
+            "strategy": "Pure Strategy (Pass Dominated)"
         }
-
-    # 一次条件から確率を計算 (0〜100ではなく、0.0〜1.0 の比率として算出)
-    pa = (d - c) / denominator  # オフェンスのパス比率
-    pb = (d - b) / denominator  # ディフェンスのパス警戒比率
-
-    # 🛡️ ガード機能：確率が 0.0 未満、または 1.0 を超えた場合の丸め処理
-    # これにより、実データ（支配戦略）の時でも 100% や 0% に綺麗に収まります
-    pa = max(0.0, min(1.0, pa))
-    pb = max(0.0, min(1.0, pb))
-
-    # パーセンテージ表記に変換
-    off_pass_ratio = pa * 100
-    off_run_ratio = (1.0 - pa) * 100
-    def_pass_ratio = pb * 100
-    def_run_ratio = (1.0 - pb) * 100
-
-    # 各戦術がぶつかる「同時確率」を計算 (足して100%になる)
-    p_pass_pass = pa * pb * 100
-    p_pass_run  = pa * (1.0 - pb) * 100
-    p_run_pass  = (1.0 - pa) * pb * 100
-    p_run_run   = (1.0 - pa) * (1.0 - pb) * 100
-
-    # 期待獲得ヤードの計算
-    exp_yards = pa * (a * pb + b * (1.0 - pb)) + (1.0 - pa) * (c * pb + d * (1.0 - pb))
-
-    return {
-        "off_pass": round(off_pass_ratio, 1),
-        "off_run": round(off_run_ratio, 1),
-        "def_pass": round(def_pass_ratio, 1),
-        "def_run": round(def_run_ratio, 1),
-        "p_pass_pass": round(p_pass_pass, 1),
-        "p_pass_run": round(p_pass_run, 1),
-        "p_run_pass": round(p_run_pass, 1),
-        "p_run_run": round(p_run_run, 1),
-        "expected_yards": round(exp_yards, 1)
-    }
+    else:
+        # ランが支配的
+        return {
+            "off_pass": 0.0, "off_run": 100.0,
+            "def_pass": 0.0, "def_run": 100.0,
+            "p_pass_pass": 0.0, "p_pass_run": 0.0,
+            "p_run_pass": 0.0, "p_run_run": 100.0,
+            "expected_yards": float(min(c, d)),
+            "strategy": "Pure Strategy (Run Dominated)"
+        }
 
 @app.route("/", methods=["GET", "POST"])
 def index():
