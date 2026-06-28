@@ -30,70 +30,57 @@ def load_team_stats_json(offense_team):
 
 def calculate_nash_and_scenarios(a, b, c, d):
     """
-    純粋戦略（鞍点）の探索機能を備えたナッシュ均衡計算関数
+    混合戦略を最優先で計算し、成立しない場合のみ純粋戦略を返すロジック
     """
     denominator = (a - b) - (c - d)
 
-    # 1. 混合戦略の計算を試みる
+    # 1. 混合戦略の計算
+    # 分母が0だと均衡が成立しない
     if denominator != 0:
         pa = (d - c) / denominator
         pb = (d - b) / denominator
 
-        # 混合戦略が成立する条件: 0 < p < 1
+        # 確率が 0 < p < 1 の範囲内であれば、混合戦略ナッシュ均衡を採用
         if 0 < pa < 1 and 0 < pb < 1:
-            # 混合戦略が有効な場合
-            off_pass = pa * 100
-            off_run = (1.0 - pa) * 100
-            def_pass = pb * 100
-            def_run = (1.0 - pb) * 100
-            
-            # 期待利得の再計算
             exp_yards = pa * (a * pb + b * (1.0 - pb)) + (1.0 - pa) * (c * pb + d * (1.0 - pb))
             
             return {
-                "off_pass": round(off_pass, 1), "off_run": round(off_run, 1),
-                "def_pass": round(def_pass, 1), "def_run": round(def_run, 1),
+                "strategy": "Mixed Strategy",
+                "off_pass": round(pa * 100, 1),
+                "off_run": round((1.0 - pa) * 100, 1),
+                "def_pass": round(pb * 100, 1),
+                "def_run": round((1.0 - pb) * 100, 1),
                 "p_pass_pass": round(pa * pb * 100, 1),
                 "p_pass_run": round(pa * (1.0 - pb) * 100, 1),
                 "p_run_pass": round((1.0 - pa) * pb * 100, 1),
                 "p_run_run": round((1.0 - pa) * (1.0 - pb) * 100, 1),
-                "expected_yards": round(exp_yards, 1),
-                "strategy": "Mixed Strategy"
+                "expected_yards": round(exp_yards, 1)
             }
 
-    # 2. 純粋戦略（支配戦略）の探索
-    # オフェンスのパス期待値とラン期待値の比較
-    # マクシミン基準（最悪の場合を想定して、その中で一番マシなものを選ぶ）
-    # パスを選んだ時の最悪: min(a, b) / ランを選んだ時の最悪: min(c, d)
-    
-    payoff_pass_if_def_pass = a
-    payoff_pass_if_def_run = b
-    payoff_run_if_def_pass = c
-    payoff_run_if_def_run = d
-
-    # オフェンスにとってのマクシミン
-    min_if_pass = min(payoff_pass_if_def_pass, payoff_pass_if_def_run)
-    min_if_run = min(payoff_run_if_def_pass, payoff_run_if_def_run)
+    # 2. 混合戦略が成立しない場合（範囲外）、純粋戦略（支配戦略）へ分岐
+    # オフェンスにとってのマクシミン戦略（最悪でもここまでは取れるという最大値）
+    min_if_pass = min(a, b)
+    min_if_run = min(c, d)
 
     if min_if_pass >= min_if_run:
         # パスが支配的
         return {
+            "strategy": "Pure Strategy (Pass Dominated)",
             "off_pass": 100.0, "off_run": 0.0,
             "def_pass": 100.0, "def_run": 0.0,
             "p_pass_pass": 100.0, "p_pass_run": 0.0,
             "p_run_pass": 0.0, "p_run_run": 0.0,
-            "expected_yards": float(min(a, b)),
-            "strategy": "Pure Strategy (Pass Dominated)"
+            "expected_yards": float(min(a, b))
         }
     else:
         # ランが支配的
         return {
+            "strategy": "Pure Strategy (Run Dominated)",
             "off_pass": 0.0, "off_run": 100.0,
             "def_pass": 0.0, "def_run": 100.0,
             "p_pass_pass": 0.0, "p_pass_run": 0.0,
             "p_run_pass": 0.0, "p_run_run": 100.0,
-            "expected_yards": float(min(c, d)),
-            "strategy": "Pure Strategy (Run Dominated)"
+            "expected_yards": float(min(c, d))
         }
 
 @app.route("/", methods=["GET", "POST"])
