@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request
-import nfl_data_py as nfl
-import pandas as pd
-import numpy as np
+import json
+import os
 
 app = Flask(__name__)
 
-# NFL全32チームの略称リスト（ドロップダウン用）
+# NFL全32チームの略称リスト
 NFL_TEAMS = sorted([
     'ARI', 'ATL', 'BAL', 'BUF', 'CAR', 'CHI', 'CIN', 'CLE',
     'DAL', 'DEN', 'DET', 'GB', 'HOU', 'IND', 'JAX', 'KC',
@@ -13,45 +12,21 @@ NFL_TEAMS = sorted([
     'NYJ', 'PHI', 'PIT', 'SEA', 'SF', 'TB', 'TEN', 'WAS'
 ])
 
-def get_team_stats_from_nfl_data(offense_team):
+def load_team_stats_json(offense_team):
     """
-    nfl_data_py から指定されたオフェンスチームの直近のpbp(Play-by-Play)データを取得し、
-    対戦相手の守備傾向に応じた4つの平均獲得ヤード(a, b, c, d)を算出する
+    事前集計済みの軽量JSONファイルからチームのスタッツ(a, b, c, d)を読み込む。
+    メモリを一切消費せず、一瞬で処理が完了します。
     """
     try:
-        # 2025年シーズンのデータを取得
-        df_pbp = nfl.import_pbp_data([2025])
+        json_path = os.path.join(os.path.dirname(__file__), 'nfl_stats_2025.json')
+        with open(json_path, 'r', encoding='utf-8') as f:
+            stats_dict = json.load(f)
         
-        # 該当チームの攻撃プレイ、かつパスかランのみに絞り込む
-        df_team = df_pbp[
-            (df_pbp['postfix_team'] == offense_team) & 
-            (df_pbp['play_type'].isin(['pass', 'run'])) &
-            (df_pbp['yards_gained'].notna())
-        ].copy()
-        
-        if df_team.empty:
-            return None
-            
-        # ディフェンスの警戒度を「ディフェンスのボックス人数(defenders_in_box)」で判定
-        # 7人以上＝ラン警戒(Run Contain) / 6人以下＝パス警戒(Pass Cover)
-        df_team['def_alignment'] = np.where(df_team['defenders_in_box'] >= 7, 'run_contain', 'pass_cover')
-        
-        # 4つのシナリオの平均ヤードを計算
-        a = df_team[(df_team['play_type'] == 'pass') & (df_team['def_alignment'] == 'pass_cover')]['yards_gained'].mean()
-        b = df_team[(df_team['play_type'] == 'pass') & (df_team['def_alignment'] == 'run_contain')]['yards_gained'].mean()
-        c = df_team[(df_team['play_type'] == 'run') & (df_team['def_alignment'] == 'pass_cover')]['yards_gained'].mean()
-        d = df_team[(df_team['play_type'] == 'run') & (df_team['def_alignment'] == 'run_contain')]['yards_gained'].mean()
-        
-        # データ不足時の補正
-        a = round(a, 1) if not pd.isna(a) else 4.0
-        b = round(b, 1) if not pd.isna(b) else 10.0
-        c = round(c, 1) if not pd.isna(c) else 5.5
-        d = round(d, 1) if not pd.isna(d) else 2.5
-        
-        return a, b, c, d
+        if offense_team in stats_dict:
+            return stats_dict[offense_team] # [a, b, c, d] のリストが返る
     except Exception as e:
-        print(f"Error fetching data: {e}")
-        return None
+        print(f"Error loading JSON: {e}")
+    return None
 
 def calculate_nash_and_scenarios(a, b, c, d):
     """
@@ -69,7 +44,6 @@ def calculate_nash_and_scenarios(a, b, c, d):
             "expected_yards": round(exp_yards, 1)
         }
 
-    # 修正前の数式のままパーセンテージに変換
     off_pass_ratio = ((d - c) / denominator) * 100
     off_run_ratio = 100.0 - off_pass_ratio
 
@@ -95,7 +69,7 @@ def calculate_nash_and_scenarios(a, b, c, d):
         "p_pass_run": round(p_pass_run, 1),
         "p_run_pass": round(p_run_pass, 1),
         "p_run_run": round(p_run_run, 1),
-        "expected_yards": round(exp_yards, 1)
+        "expected_watts" if False else "expected_yards": round(exp_yards, 1)
     }
 
 @app.route("/", methods=["GET", "POST"])
@@ -114,7 +88,7 @@ def index():
         elif action == "fetch_stats":
             team = request.form.get("team_select")
             if team:
-                stats = get_team_stats_from_nfl_data(team)
+                stats = load_team_stats_json(team)
                 if stats:
                     form_data["gain_a"], form_data["gain_b"], form_data["gain_c"], form_data["gain_d"] = stats
                     form_data["selected_team"] = team
