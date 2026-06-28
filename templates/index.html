@@ -71,19 +71,19 @@
         <div class="grid-2">
             <fieldset>
                 <legend>Pass Play Payoffs</legend>
-                <label for="gain_a">Pass vs Pass Cover (a)</label>
+                <label for="gain_a">Pass vs Pass Cover</label>
                 <input type="number" step="0.1" name="gain_a" id="gain_a" value="{{ request.form.get('gain_a', '') }}" placeholder="e.g. 3" required>
 
-                <label for="gain_b">Pass vs Run Contain (b)</label>
+                <label for="gain_b">Pass vs Run Contain</label>
                 <input type="number" step="0.1" name="gain_b" id="gain_b" value="{{ request.form.get('gain_b', '') }}" placeholder="e.g. 15" required>
             </fieldset>
 
             <fieldset>
                 <legend>Run Play Payoffs</legend>
-                <label for="gain_c">Run vs Pass Cover (c)</label>
+                <label for="gain_c">Run vs Pass Cover</label>
                 <input type="number" step="0.1" name="gain_c" id="gain_c" value="{{ request.form.get('gain_c', '') }}" placeholder="e.g. 8" required>
 
-                <label for="gain_d">Run vs Run Contain (d)</label>
+                <label for="gain_d">Run vs Run Contain</label>
                 <input type="number" step="0.1" name="gain_d" id="gain_d" value="{{ request.form.get('gain_d', '') }}" placeholder="e.g. 2" required>
             </fieldset>
         </div>
