@@ -30,35 +30,50 @@ def load_team_stats_json(offense_team):
 
 def calculate_nash_and_scenarios(a, b, c, d):
     """
-    混合戦略を最優先で計算し、成立しない場合のみ純粋戦略を返すロジック
+    混合戦略の均衡を最優先で計算し、それが成立しない場合（支配戦略がある場合）のみ
+    純粋戦略の均衡を返す計算ロジック
     """
+    # 利得マトリクス
+    #        | Pass守備(pb) | Run守備(1-pb)
+    # Pass(pa)|     a        |      b
+    # Run(1-pa)|     c        |      d
+    
     denominator = (a - b) - (c - d)
+    
+    # 0除算対策: 分母が0の場合は純粋戦略へ
+    if denominator == 0:
+        return handle_pure_strategy(a, b, c, d)
 
-    # 1. 混合戦略の計算
-    # 分母が0だと均衡が成立しない
-    if denominator != 0:
-        pa = (d - c) / denominator
-        pb = (d - b) / denominator
+    # ナッシュ均衡の基本式
+    pa = (d - c) / denominator
+    pb = (d - b) / denominator
 
-        # 確率が 0 < p < 1 の範囲内であれば、混合戦略ナッシュ均衡を採用
-        if 0 < pa < 1 and 0 < pb < 1:
-            exp_yards = pa * (a * pb + b * (1.0 - pb)) + (1.0 - pa) * (c * pb + d * (1.0 - pb))
-            
-            return {
-                "strategy": "Mixed Strategy",
-                "off_pass": round(pa * 100, 1),
-                "off_run": round((1.0 - pa) * 100, 1),
-                "def_pass": round(pb * 100, 1),
-                "def_run": round((1.0 - pb) * 100, 1),
-                "p_pass_pass": round(pa * pb * 100, 1),
-                "p_pass_run": round(pa * (1.0 - pb) * 100, 1),
-                "p_run_pass": round((1.0 - pa) * pb * 100, 1),
-                "p_run_run": round((1.0 - pa) * (1.0 - pb) * 100, 1),
-                "expected_yards": round(exp_yards, 1)
-            }
+    # 1. 混合戦略の判定 (0 < p < 1)
+    # ここで「パスのみ」「ランのみ」に固定せず、駆け引きの比率を優先して計算する
+    if 0 < pa < 1 and 0 < pb < 1:
+        exp_yards = pa * (a * pb + b * (1.0 - pb)) + (1.0 - pa) * (c * pb + d * (1.0 - pb))
+        
+        return {
+            "strategy": "Mixed Strategy",
+            "off_pass": round(pa * 100, 1),
+            "off_run": round((1.0 - pa) * 100, 1),
+            "def_pass": round(pb * 100, 1),
+            "def_run": round((1.0 - pb) * 100, 1),
+            "p_pass_pass": round(pa * pb * 100, 1),
+            "p_pass_run": round(pa * (1.0 - pb) * 100, 1),
+            "p_run_pass": round((1.0 - pa) * pb * 100, 1),
+            "p_run_run": round((1.0 - pa) * (1.0 - pb) * 100, 1),
+            "expected_yards": round(exp_yards, 1)
+        }
+    
+    # 2. 混合戦略が成立しない場合（確率が範囲外）は純粋戦略へ
+    return handle_pure_strategy(a, b, c, d)
 
-    # 2. 混合戦略が成立しない場合（範囲外）、純粋戦略（支配戦略）へ分岐
-    # オフェンスにとってのマクシミン戦略（最悪でもここまでは取れるという最大値）
+def handle_pure_strategy(a, b, c, d):
+    """
+    純粋戦略（支配戦略）の探索ロジック
+    """
+    # マクシミン戦略: オフェンスが選んだプレイに対し、ディフェンスが最適に守った場合の最悪利得を比較
     min_if_pass = min(a, b)
     min_if_run = min(c, d)
 
