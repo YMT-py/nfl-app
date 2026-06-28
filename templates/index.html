@@ -1,22 +1,225 @@
-{% if result %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFL Play-Call Simulator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
+    <style>
+        /* ライトモード（デフォルト）変数 */
+        :root {
+            --bg-body: #f4f6f9;
+            --bg-container: #ffffff;
+            --text-main: #101820;
+            --text-sub: #627d98;
+            --border-color: #e2e8f0;
+            --input-bg: #ffffff;
+            --box-bg: #fafbfc;
+        }
+
+        /* 3. ダークモード用変数 */
+        [data-theme="dark"] {
+            --bg-body: #0b111e;
+            --bg-container: #141f32;
+            --text-main: #f4f6f9;
+            --text-sub: #9aaec4;
+            --border-color: #2d3d5a;
+            --input-bg: #1e2d4a;
+            --box-bg: #1a263b;
+        }
+
+        body { padding: 10px; background-color: var(--bg-body); font-family: 'Roboto', sans-serif; color: var(--text-main); transition: all 0.3s ease; }
+        .container { max-width: 800px; background: var(--bg-container); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 10px; border-top: 6px solid #013369; transition: all 0.3s ease; }
+        
+        /* ダークモード切替スイッチ用 */
+        .theme-switch-wrapper { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
+        .theme-switch-wrapper span { font-size: 1.2rem; font-weight: bold; margin-right: 8px; color: var(--text-sub); text-transform: uppercase; }
+        .theme-switch { display: inline-block; height: 24px; position: relative; width: 50px; }
+        .theme-switch input { display:none; }
+        .slider { background-color: #ccc; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; }
+        .slider:before { background-color: white; bottom: 4px; content: ""; height: 16px; left: 4px; position: absolute; transition: .4s; width: 16px; border-radius: 50%; }
+        input:checked + .slider { background-color: #013369; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        h1 { text-align: center; color: #013369; margin-bottom: 5px; font-size: 2.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        [data-theme="dark"] h1 { color: #3b82f6; }
+        .subtitle { text-align: center; color: var(--text-sub); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase; font-weight: bold; }
+        .description { text-align: center; color: var(--text-sub); font-size: 1.3rem; line-height: 1.5; max-width: 600px; margin: 0 auto 25px auto; padding: 0 10px; }
+        
+        .result-box { background-color: var(--bg-container); border: 2px solid #013369; padding: 25px; border-radius: 8px; margin-top: 30px; }
+        [data-theme="dark"] .result-box { border-color: #3b82f6; }
+        .error-box { background-color: #fff5f5; border-left: 5px solid #D50A0A; padding: 15px; border-radius: 4px; color: #c53030; font-weight: 600; margin-bottom: 20px; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        fieldset { border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; margin-bottom: 10px; background-color: var(--box-bg); }
+        fieldset legend { color: #013369; font-weight: bold; font-size: 1.5rem; text-transform: uppercase; padding: 0 10px; }
+        [data-theme="dark"] fieldset legend { color: #3b82f6; }
+
+        label { margin-bottom: 6px; font-size: 1.3rem; color: var(--text-sub); font-weight: 600; }
+        input[type="number"], select { margin-bottom: 15px; height: 4.4rem; font-size: 1.6rem; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); }
+        
+        .btn-calc { width: 100%; margin-top: 10px; height: 5.0rem; font-size: 1.6rem; background-color: #D50A0A; border-color: #D50A0A; font-weight: bold; border-radius: 6px; text-transform: uppercase; }
+        .btn-calc:hover { background-color: #b30808; border-color: #b30808; }
+        .btn-secondary { background-color: transparent; border-color: var(--text-sub); color: var(--text-sub); text-transform: uppercase; font-weight: bold; height: 4.4rem; }
+        .btn-secondary:hover { border-color: var(--text-main); color: var(--text-main); }
+
+        h4 { margin-top: 10px; margin-bottom: 15px; font-size: 1.8rem; padding-bottom: 8px; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid var(--border-color); }
+        .offense-title { color: #013369; }
+        [data-theme="dark"] .offense-title { color: #3b82f6; }
+        .defense-title { color: var(--text-sub); }
+        .stat-value { font-size: 2.4rem; font-weight: bold; color: #013369; }
+        [data-theme="dark"] .stat-value { color: #3b82f6; }
+
+        .expected-yards-box { background-color: #013369; color: white; padding: 15px 20px; border-radius: 6px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
+        [data-theme="dark"] .expected-yards-box { background-color: #1e3a8a; }
+        .expected-yards-title { font-weight: bold; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .expected-yards-value { font-size: 2.6rem; font-weight: 700; color: #ffffff; }
+
+        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .matrix-table th, .matrix-table td { border: 1px solid var(--border-color); padding: 12px; text-align: center; color: var(--text-main); }
+        .matrix-table th { background-color: var(--box-bg); color: #013369; font-weight: bold; text-transform: uppercase; }
+        [data-theme="dark"] .matrix-table th { color: #3b82f6; }
+        .probability-highlight { font-size: 1.8rem; font-weight: bold; color: #D50A0A; }
+
+        @media (min-width: 600px) {
+            body { padding: 30px; }
+            .container { padding: 40px; margin-top: 20px; }
+            .grid-2 { grid-template-columns: 1fr 1fr; gap: 25px; }
+            h1 { font-size: 3.4rem; }
+            .description { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 3. ダークモードトグル -->
+    <div class="theme-switch-wrapper">
+        <span>Dark Mode</span>
+        <label class="theme-switch" for="checkbox">
+            <input type="checkbox" id="checkbox" />
+            <div class="slider"></div>
+        </label>
+    </div>
+
+    <h1>🏈 NFL Play-Call Simulator</h1>
+    <div class="subtitle">Game Theory & Nash Equilibrium Analytics</div>
+    
+    <div class="description">
+        Analyze the optimal play-calling balance between Pass and Run. Select a team to auto-populate from 2025 NFL stats, or manually adjust yardage fields to compute the Nash Equilibrium.
+    </div>
+
+    {% if error %}
+        <div class="error-box">ERROR: {{ error }}</div>
+    {% endif %}
+
+    <!-- 1. スタッツ読み込み用フォーム -->
+    <form method="POST" style="margin-bottom: 25px; padding: 15px; border: 1px dashed var(--border-color); border-radius: 6px;">
+        <input type="hidden" name="action" value="fetch_stats">
+        <label for="team_select" style="font-size: 1.4rem;">📊 Load Team Real Stats (nfl_data_py)</label>
+        <div style="display: flex; gap: 15px; align-items: center; margin-top: 5px;">
+            <select name="team_select" id="team_select" style="margin-bottom: 0; flex-grow: 1;">
+                <option value="">-- Select NFL Team --</option>
+                {% for team in teams %}
+                    <option value="{{ team }}" {% if form_data.selected_team == team %}selected{% endif %}>{{ team }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="button" style="margin-bottom: 0; background-color: #013369; border-color: #013369; font-weight: bold;">Load Stats</button>
+        </div>
+    </form>
+
+    <!-- メイン計算フォーム -->
+    <form method="POST">
+        <input type="hidden" name="action" value="calculate">
+        <input type="hidden" name="selected_team" value="{{ form_data.selected_team }}">
+        
+        <div class="grid-2">
+            <!-- OFFENSE: PASS PAYOFFS -->
+            <fieldset>
+                <legend>Pass Play Payoffs</legend>
+                <label for="gain_a">Pass vs Pass Cover (a)</label>
+                <input type="number" step="0.1" name="gain_a" id="gain_a" value="{{ form_data.gain_a }}" placeholder="e.g. 3" required>
+
+                <label for="gain_b">Pass vs Run Contain (b)</label>
+                <input type="number" step="0.1" name="gain_b" id="gain_b" value="{{ form_data.gain_b }}" placeholder="e.g. 15" required>
+            </fieldset>
+
+            <!-- OFFENSE: RUN PAYOFFS -->
+            <fieldset>
+                <legend>Run Play Payoffs</legend>
+                <label for="gain_c">Run vs Pass Cover (c)</label>
+                <input type="number" step="0.1" name="gain_c" id="gain_c" value="{{ form_data.gain_c }}" placeholder="e.g. 8" required>
+
+                <label for="gain_d">Run vs Run Contain (d)</label>
+                <input type="number" step="0.1" name="gain_d" id="gain_d" value="{{ form_data.gain_d }}" placeholder="e.g. 2" required>
+            </fieldset>
+        </div>
+
+        <button type="submit" class="button btn-calc">Calculate Nash Equilibrium</button>
+    </form>
+
+    <!-- 2. 入力値クリア用フォーム -->
+    <form method="POST" style="margin-top: -10px;">
+        <input type="hidden" name="action" value="clear">
+        <button type="submit" class="button button-outline btn-secondary" style="width: 100%;">Clear Fields</button>
+    </form>
+
+    <!-- RESULTS -->
+  {% if result %}
         <div class="result-box">
-            <div class="strategy-badge {% if 'Pure' in result.strategy %}badge-pure{% else %}badge-mixed{% endif %}">
-                {{ result.strategy }}
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span style="padding: 10px 20px; background: #013369; color: white; border-radius: 4px; font-weight: bold;">
+                    {{ result.strategy }}
+                </span>
             </div>
-            <h3>📊 Optimal Strategy Ratios</h3>
-            <div style="display: flex; gap: 40px; justify-content: center; margin-bottom: 20px;">
+            
+            <h3 style="font-size: 2.2rem; margin-bottom: 15px; color: #013369; font-weight: 700; text-transform: uppercase;">📊 Optimal Strategy Ratios</h3>
+            
+            <div style="display: flex; justify-content: center; gap: 50px; margin-top: 20px;">
                 <div>
-                    <h4 style="margin-bottom: 5px;">Pass Call</h4>
+                    <h4 class="offense-title">Pass Ratio</h4>
                     <span class="stat-value">{{ result.off_pass }}%</span>
                 </div>
                 <div>
-                    <h4 style="margin-bottom: 5px;">Run Call</h4>
+                    <h4 class="offense-title">Run Ratio</h4>
                     <span class="stat-value">{{ result.off_run }}%</span>
                 </div>
             </div>
+
             <div class="expected-yards-box">
-                <span>🏈 Expected Yards</span>
-                <span style="font-size: 2.6rem; font-weight: 700;">{{ result.expected_yards }} yds</span>
+                <span class="expected-yards-title">🏈 Expected Yards per Play</span>
+                <span class="expected-yards-value">{{ result.expected_yards }} yds</span>
             </div>
         </div>
     {% endif %}
+</div>
+
+<!-- ダークモード切り替え用のJavaScript -->
+<script>
+    const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
+    const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+
+    if (currentTheme) {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        if (currentTheme === 'dark') {
+            toggleSwitch.checked = true;
+        }
+    }
+
+    function switchTheme(e) {
+        if (e.target.checked) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+        }    
+    }
+
+    toggleSwitch.addEventListener('change', switchTheme, false);
+</script>
+
+</body>
+</html>

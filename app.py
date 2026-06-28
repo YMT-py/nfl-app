@@ -13,7 +13,6 @@ NFL_TEAMS = sorted([
 ])
 
 def load_team_stats_json(offense_team):
-    """事前集計済みのJSONから2025年のスタッツ(a, b, c, d)を読み込む"""
     try:
         json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'nfl_stats_2025.json'))
         with open(json_path, 'r', encoding='utf-8') as f:
@@ -26,7 +25,6 @@ def load_team_stats_json(offense_team):
 
 def handle_pure_strategy(a, b, c, d):
     """純粋戦略（支配戦略）の探索ロジック"""
-    # パスがランを支配しているか（最小値比較）
     if min(a, b) >= min(c, d):
         return {
             "strategy": "Pure Strategy (Pass Dominated)",
@@ -44,7 +42,6 @@ def calculate_nash_and_scenarios(a, b, c, d):
     """混合戦略を優先し、成立しない場合に純粋戦略を返すロジック"""
     denominator = (a - b) - (c - d)
     
-    # 分母が0の場合（純粋戦略へ）
     if denominator == 0:
         return handle_pure_strategy(a, b, c, d)
 
@@ -61,25 +58,22 @@ def calculate_nash_and_scenarios(a, b, c, d):
             "expected_yards": round(exp_yards, 1)
         }
     
-    # 範囲外の場合は純粋戦略へ
     return handle_pure_strategy(a, b, c, d)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     result = None
-    form_data = {"gain_a": "6.3", "gain_b": "8.9", "gain_c": "4.7", "gain_d": "3.2", "selected_team": "KC"}
+    form_data = {"gain_a": "", "gain_b": "", "gain_c": "", "gain_d": "", "selected_team": ""}
     error = None
 
     if request.method == 'POST':
         action = request.form.get("action")
-        
         if action == "fetch_stats":
             team = request.form.get("team_select")
             stats = load_team_stats_json(team)
             if stats:
                 form_data.update({"gain_a": str(stats[0]), "gain_b": str(stats[1]), 
                                   "gain_c": str(stats[2]), "gain_d": str(stats[3]), "selected_team": team})
-        
         elif action == "calculate":
             try:
                 a, b, c, d = float(request.form.get("gain_a")), float(request.form.get("gain_b")), \
