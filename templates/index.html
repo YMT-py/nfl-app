@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.min.css">
     <style>
-        /* ライトモード（デフォルト）変数 */
+        /* デフォルト（ライトモード）変数 */
         :root {
             --bg-body: #f4f6f9;
             --bg-container: #ffffff;
@@ -17,9 +17,10 @@
             --border-color: #e2e8f0;
             --input-bg: #ffffff;
             --box-bg: #fafbfc;
+            --accent-color: #013369;
         }
 
-        /* 3. ダークモード用変数 */
+        /* ダークモード用変数 */
         [data-theme="dark"] {
             --bg-body: #0b111e;
             --bg-container: #141f32;
@@ -28,19 +29,22 @@
             --border-color: #2d3d5a;
             --input-bg: #1e2d4a;
             --box-bg: #1a263b;
+            --accent-color: #3b82f6;
         }
 
-        body { padding: 10px; background-color: var(--bg-body); font-family: 'Roboto', sans-serif; color: var(--text-main); transition: all 0.3s ease; }
-        .container { max-width: 800px; background: var(--bg-container); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 10px; border-top: 6px solid #013369; transition: all 0.3s ease; }
+        body { padding: 10px; background-color: var(--bg-body); font-family: 'Roboto', sans-serif; color: var(--text-main); transition: background-color 0.3s ease, color 0.3s ease; }
+        .container { max-width: 800px; background: var(--bg-container); padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top: 10px; border-top: 6px solid #013369; transition: background-color 0.3s ease, border-color 0.3s ease; }
+        [data-theme="dark"] .container { border-top-color: #3b82f6; }
         
-        /* ダークモード切替スイッチ用 */
-        .theme-switch-wrapper { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
+        /* ダークモード切替スイッチ */
+        .theme-switch-wrapper { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 15px; }
         .theme-switch-wrapper span { font-size: 1.2rem; font-weight: bold; margin-right: 8px; color: var(--text-sub); text-transform: uppercase; }
-        .theme-switch { display: inline-block; height: 24px; position: relative; width: 50px; }
+        .theme-switch { display: inline-block; height: 24px; position: relative; width: 50px; margin-bottom: 0; }
         .theme-switch input { display:none; }
         .slider { background-color: #ccc; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; }
         .slider:before { background-color: white; bottom: 4px; content: ""; height: 16px; left: 4px; position: absolute; transition: .4s; width: 16px; border-radius: 50%; }
         input:checked + .slider { background-color: #013369; }
+        [data-theme="dark"] input:checked + .slider { background-color: #3b82f6; }
         input:checked + .slider:before { transform: translateX(26px); }
 
         h1 { text-align: center; color: #013369; margin-bottom: 5px; font-size: 2.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
@@ -48,40 +52,42 @@
         .subtitle { text-align: center; color: var(--text-sub); font-size: 1.2rem; margin-bottom: 10px; text-transform: uppercase; font-weight: bold; }
         .description { text-align: center; color: var(--text-sub); font-size: 1.3rem; line-height: 1.5; max-width: 600px; margin: 0 auto 25px auto; padding: 0 10px; }
         
-        .result-box { background-color: var(--bg-container); border: 2px solid #013369; padding: 25px; border-radius: 8px; margin-top: 30px; }
-        [data-theme="dark"] .result-box { border-color: #3b82f6; }
-        .error-box { background-color: #fff5f5; border-left: 5px solid #D50A0A; padding: 15px; border-radius: 4px; color: #c53030; font-weight: 600; margin-bottom: 20px; }
+        /* アラート・結果ボックス */
+        .result-box { background-color: var(--bg-container); border: 2px solid var(--accent-color); padding: 25px; border-radius: 8px; margin-top: 30px; }
+        .error-box { background-color: #fff5f5; border-left: 5px solid #D50A0A; padding: 15px; border-radius: 4px; color: #c53030; font-weight: 600; margin-bottom: 20px; font-size: 1.4rem; }
+        [data-theme="dark"] .error-box { background-color: #2d1a1a; color: #f56565; }
         
         .grid-2 { display: grid; grid-template-columns: 1fr; gap: 20px; }
         fieldset { border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; margin-bottom: 10px; background-color: var(--box-bg); }
-        fieldset legend { color: #013369; font-weight: bold; font-size: 1.5rem; text-transform: uppercase; padding: 0 10px; }
-        [data-theme="dark"] fieldset legend { color: #3b82f6; }
+        fieldset legend { color: var(--accent-color); font-weight: bold; font-size: 1.5rem; text-transform: uppercase; padding: 0 10px; }
 
         label { margin-bottom: 6px; font-size: 1.3rem; color: var(--text-sub); font-weight: 600; }
-        input[type="number"], select { margin-bottom: 15px; height: 4.4rem; font-size: 1.6rem; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); }
         
-        .btn-calc { width: 100%; margin-top: 10px; height: 5.0rem; font-size: 1.6rem; background-color: #D50A0A; border-color: #D50A0A; font-weight: bold; border-radius: 6px; text-transform: uppercase; }
-        .btn-calc:hover { background-color: #b30808; border-color: #b30808; }
+        /* 💡 ダークモード時のインプット文字色・背景色バグを修正 */
+        input[type="number"], select { margin-bottom: 15px; height: 4.4rem; font-size: 1.6rem; background-color: var(--input-bg); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-main); }
+        input[type="number"]:focus, select:focus { border-color: var(--accent-color); }
+        
+        .btn-calc { width: 100%; margin-top: 10px; height: 5.0rem; font-size: 1.6rem; background-color: #D50A0A; border-color: #D50A0A; font-weight: bold; border-radius: 6px; text-transform: uppercase; color: #fff; }
+        .btn-calc:hover { background-color: #b30808; border-color: #b30808; color: #fff; }
         .btn-secondary { background-color: transparent; border-color: var(--text-sub); color: var(--text-sub); text-transform: uppercase; font-weight: bold; height: 4.4rem; }
-        .btn-secondary:hover { border-color: var(--text-main); color: var(--text-main); }
+        .btn-secondary:hover { border-color: var(--text-main); color: var(--text-main); background-color: transparent; }
 
         h4 { margin-top: 10px; margin-bottom: 15px; font-size: 1.8rem; padding-bottom: 8px; font-weight: 700; text-transform: uppercase; border-bottom: 2px solid var(--border-color); }
-        .offense-title { color: #013369; }
-        [data-theme="dark"] .offense-title { color: #3b82f6; }
+        .offense-title { color: var(--accent-color); }
         .defense-title { color: var(--text-sub); }
-        .stat-value { font-size: 2.4rem; font-weight: bold; color: #013369; }
-        [data-theme="dark"] .stat-value { color: #3b82f6; }
+        .stat-value { font-size: 2.4rem; font-weight: bold; color: var(--accent-color); }
 
         .expected-yards-box { background-color: #013369; color: white; padding: 15px 20px; border-radius: 6px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
         [data-theme="dark"] .expected-yards-box { background-color: #1e3a8a; }
-        .expected-yards-title { font-weight: bold; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .expected-yards-title { font-weight: bold; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; }
         .expected-yards-value { font-size: 2.6rem; font-weight: 700; color: #ffffff; }
 
+        /* テーブルまわりのダークモードアジャスト */
         .matrix-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .matrix-table th, .matrix-table td { border: 1px solid var(--border-color); padding: 12px; text-align: center; color: var(--text-main); }
-        .matrix-table th { background-color: var(--box-bg); color: #013369; font-weight: bold; text-transform: uppercase; }
-        [data-theme="dark"] .matrix-table th { color: #3b82f6; }
+        .matrix-table th, .matrix-table td { border: 1px solid var(--border-color); padding: 12px; text-align: center; color: var(--text-main); vertical-align: middle; }
+        .matrix-table th { background-color: var(--box-bg); color: var(--accent-color); font-weight: bold; text-transform: uppercase; }
         .probability-highlight { font-size: 1.8rem; font-weight: bold; color: #D50A0A; }
+        [data-theme="dark"] .probability-highlight { color: #ff6b6b; }
 
         @media (min-width: 600px) {
             body { padding: 30px; }
@@ -95,7 +101,6 @@
 <body>
 
 <div class="container">
-    <!-- 3. ダークモードトグル -->
     <div class="theme-switch-wrapper">
         <span>Dark Mode</span>
         <label class="theme-switch" for="checkbox">
@@ -115,7 +120,6 @@
         <div class="error-box">ERROR: {{ error }}</div>
     {% endif %}
 
-    <!-- 1. スタッツ読み込み用フォーム -->
     <form method="POST" style="margin-bottom: 25px; padding: 15px; border: 1px dashed var(--border-color); border-radius: 6px;">
         <input type="hidden" name="action" value="fetch_stats">
         <label for="team_select" style="font-size: 1.4rem;">📊 Load Team Real Stats (nfl_data_py)</label>
@@ -126,17 +130,15 @@
                     <option value="{{ team }}" {% if form_data.selected_team == team %}selected{% endif %}>{{ team }}</option>
                 {% endfor %}
             </select>
-            <button type="submit" class="button" style="margin-bottom: 0; background-color: #013369; border-color: #013369; font-weight: bold;">Load Stats</button>
+            <button type="submit" class="button" style="margin-bottom: 0; background-color: #013369; border-color: #013369; font-weight: bold; color: #fff;">Load Stats</button>
         </div>
     </form>
 
-    <!-- メイン計算フォーム -->
     <form method="POST">
         <input type="hidden" name="action" value="calculate">
         <input type="hidden" name="selected_team" value="{{ form_data.selected_team }}">
         
         <div class="grid-2">
-            <!-- OFFENSE: PASS PAYOFFS -->
             <fieldset>
                 <legend>Pass Play Payoffs</legend>
                 <label for="gain_a">Pass vs Pass Cover (a)</label>
@@ -146,7 +148,6 @@
                 <input type="number" step="0.1" name="gain_b" id="gain_b" value="{{ form_data.gain_b }}" placeholder="e.g. 15" required>
             </fieldset>
 
-            <!-- OFFENSE: RUN PAYOFFS -->
             <fieldset>
                 <legend>Run Play Payoffs</legend>
                 <label for="gain_c">Run vs Pass Cover (c)</label>
@@ -160,16 +161,14 @@
         <button type="submit" class="button btn-calc">Calculate Nash Equilibrium</button>
     </form>
 
-    <!-- 2. 入力値クリア用フォーム -->
     <form method="POST" style="margin-top: -10px;">
         <input type="hidden" name="action" value="clear">
         <button type="submit" class="button button-outline btn-secondary" style="width: 100%;">Clear Fields</button>
     </form>
 
-    <!-- RESULTS -->
     {% if result %}
         <div class="result-box">
-            <h3 style="font-size: 2.2rem; margin-bottom: 15px; color: #013369; font-weight: 700; text-transform: uppercase;">📊 Optimal Strategy Ratios</h3>
+            <h3 style="font-size: 2.2rem; margin-bottom: 15px; color: var(--accent-color); font-weight: 700; text-transform: uppercase; border: none; letter-spacing: 0.5px;">📊 Optimal Strategy Ratios</h3>
             
             <div class="grid-2" style="margin-top: 20px;">
                 <div>
@@ -193,7 +192,7 @@
                 <span class="expected-yards-value">{{ result.expected_yards }} yds</span>
             </div>
 
-            <h4 style="margin-top: 30px;">🎲 Scenario Occurrence Probability Matrix</h4>
+            <h4 style="margin-top: 30px;" class="offense-title">🎲 Scenario Occurrence Probability Matrix</h4>
             <table class="matrix-table">
                 <thead>
                     <tr>
@@ -206,36 +205,35 @@
                     <tr>
                         <td style="font-weight: bold;">Pass ({{ result.off_pass }}%)</td>
                         <td>
-                            <div>Pass vs Pass</div>
+                            <div style="font-size: 1.2rem; opacity: 0.8;">Pass vs Pass</div>
                             <div class="probability-highlight">{{ result.p_pass_pass }}%</div>
                         </td>
                         <td>
-                            <div>Pass vs Run</div>
+                            <div style="font-size: 1.2rem; opacity: 0.8;">Pass vs Run</div>
                             <div class="probability-highlight">{{ result.p_pass_run }}%</div>
                         </td>
                     </tr>
                     <tr>
                         <td style="font-weight: bold;">Run ({{ result.off_run }}%)</td>
                         <td>
-                            <div>Run vs Pass</div>
+                            <div style="font-size: 1.2rem; opacity: 0.8;">Run vs Pass</div>
                             <div class="probability-highlight">{{ result.p_run_pass }}%</div>
                         </td>
                         <td>
-                            <div>Run vs Run</div>
+                            <div style="font-size: 1.2rem; opacity: 0.8;">Run vs Run</div>
                             <div class="probability-highlight">{{ result.p_run_run }}%</div>
                         </td>
                     </tr>
                 </tbody>
             </table>
 
-            <p style="font-size: 1.2rem; var(--text-sub); margin-top: 25px; font-style: italic; line-height: 1.6; border-top: 1px solid var(--border-color); padding-top: 15px;">
+            <p style="font-size: 1.2rem; color: var(--text-sub); margin-top: 25px; font-style: italic; line-height: 1.6; border-top: 1px solid var(--border-color); padding-top: 15px; margin-bottom: 0;">
                 * The scenario with the highest probability represents the strategic focus area determined by the asymmetric payoffs of pass and run plays.
             </p>
         </div>
     {% endif %}
 </div>
 
-<!-- ダークモード切り替え用のJavaScript -->
 <script>
     const toggleSwitch = document.querySelector('.theme-switch input[type="checkbox"]');
     const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
